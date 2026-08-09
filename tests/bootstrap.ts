@@ -7,6 +7,7 @@ import { dbAssertions } from '@adonisjs/lucid/plugins/db'
 import testUtils from '@adonisjs/core/services/test_utils'
 import { authBrowserClient } from '@adonisjs/auth/plugins/browser_client'
 import { sessionBrowserClient } from '@adonisjs/session/plugins/browser_client'
+import { apiClient } from '@japa/api-client'
 
 /**
  * This file is imported by the "bin/test.ts" entrypoint file
@@ -23,6 +24,7 @@ export const plugins: Config['plugins'] = [
   browserClient({ runInSuites: ['browser'] }),
   sessionBrowserClient(app),
   authBrowserClient(app),
+  apiClient(),
 ]
 
 /**
