@@ -12,7 +12,10 @@ export class PricingCalculator {
     return Math.round(amountInMainUnit * 100)
   }
 
-  public static toMainUnit(amountInMinorUnit: number): number {
+  public static toMainUnit(amountInMinorUnit: number | bigint): number {
+    if (typeof amountInMinorUnit === 'bigint') {
+      return Number(amountInMinorUnit) / 100
+    }
     return amountInMinorUnit / 100
   }
 
