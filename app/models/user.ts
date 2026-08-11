@@ -2,8 +2,10 @@ import { UserSchema } from '#database/schema'
 import hash from '@adonisjs/core/services/hash'
 import { compose } from '@adonisjs/core/helpers'
 import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
-import { beforeCreate } from '@adonisjs/lucid/orm'
-import string from '@adonisjs/core/helpers/string'
+import { beforeCreate, hasMany } from '@adonisjs/lucid/orm'
+import stringHelpers from '@adonisjs/core/helpers/string'
+import type { HasMany } from '@adonisjs/lucid/types/relations'
+import Document from './document.ts'
 /**
  * User model represents a user in the application.
  * It extends UserSchema and includes authentication capabilities
@@ -11,10 +13,13 @@ import string from '@adonisjs/core/helpers/string'
  */
 
 export default class User extends compose(UserSchema, withAuthFinder(hash)) {
+  @hasMany(() => Document)
+  declare documents: HasMany<typeof Document>
+
   @beforeCreate()
   public static assignUuid(user: User) {
     if (!user.id) {
-      user.id = string.uuid()
+      user.id = stringHelpers.uuid()
     }
   }
 }

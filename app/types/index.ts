@@ -32,3 +32,14 @@ export interface DocumentTotals {
   grandTotal: number
   lineItems: CalculatedLineItem[]
 }
+
+// Document Types
+
+export const DocumentStatusesEnum = {
+  Draft: 'draft',
+  Finalized: 'finalized',
+} as const
+
+export const documentStatuses = Object.values(DocumentStatusesEnum)
+
+export type DocumentStatus = (typeof DocumentStatusesEnum)[keyof typeof DocumentStatusesEnum]
