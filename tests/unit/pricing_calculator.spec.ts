@@ -1,9 +1,9 @@
 import { test } from '@japa/runner'
 import { CalculationError, PricingCalculator } from '#services/pricing_calculator_service'
-import { DiscountTypesEnum } from '../../app/types/index.ts'
+import { DiscountTypesEnum } from '#types/index'
 
 test.group('PricingCalculator', () => {
-  test('should match the expected calculation results after discount and tax are applied', ({
+  test('should test the `calculateDocument` method and return the expected calculation results after discount and tax are applied', ({
     assert,
   }) => {
     const sampleInput = [
@@ -63,7 +63,23 @@ test.group('PricingCalculator', () => {
     assert.equal(result.grandTotal, 421.5)
   })
 
-  test('should throw CalculationError when fixed discount exceeds line subtotal', ({ assert }) => {
+  test('should test the `calculateDocument` method and return zero totals and an empty lineItems array when no line items are provided', ({
+    assert,
+  }) => {
+    const result = PricingCalculator.calculateDocument([])
+
+    assert.containSubset(result, {
+      subtotal: 0,
+      totalDiscount: 0,
+      totalTax: 0,
+      grandTotal: 0,
+      lineItems: [],
+    })
+  }).tags(['pricing_calculator'])
+
+  test('should test the `calculateLine` method and throw CalculationError when fixed discount exceeds line subtotal', ({
+    assert,
+  }) => {
     const item = {
       description: 'Over-discounted Item',
       quantity: 1,
@@ -79,7 +95,9 @@ test.group('PricingCalculator', () => {
     )
   }).tags(['pricing_calculator'])
 
-  test('should throw CalculationError for invalid quantity or price', ({ assert }) => {
+  test('should test the `calculateLine` method and throw CalculationError for invalid quantity or price', ({
+    assert,
+  }) => {
     const badQuantityItemDescription = 'Bad Quantity Item'
     assert.throws(
       () =>
@@ -105,7 +123,9 @@ test.group('PricingCalculator', () => {
     )
   }).tags(['pricing_calculator'])
 
-  test('should throw CalculationError when tax percentage value is invalid', ({ assert }) => {
+  test('should test the `calculateLine` method and throw CalculationError when tax percentage value is invalid', ({
+    assert,
+  }) => {
     const description = 'Invalid Tax Item'
     assert.throws(
       () =>
@@ -122,7 +142,9 @@ test.group('PricingCalculator', () => {
     )
   }).tags(['pricing_calculator'])
 
-  test('shold throw CalculationError when discount percentage value is invalid', ({ assert }) => {
+  test('should test the `calculateLine` method and throw CalculationError when discount percentage value is invalid', ({
+    assert,
+  }) => {
     const description = 'Invalid Discount Item'
     assert.throws(
       () =>
@@ -136,14 +158,6 @@ test.group('PricingCalculator', () => {
         }),
       CalculationError,
       `Discount percent must be between 0 and 100 for line: "${description}"`
-    )
-  }).tags(['pricing_calculator'])
-
-  test('should throw CalculationError when no line item is provided', ({ assert }) => {
-    assert.throws(
-      () => PricingCalculator.calculateDocument([]),
-      CalculationError,
-      'Document must contain at least one line item.'
     )
   }).tags(['pricing_calculator'])
 })
