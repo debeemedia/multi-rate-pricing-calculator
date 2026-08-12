@@ -4,6 +4,8 @@
  */
 
 export const controllers = {
+  DocumentLineItems: () => import('#controllers/document_line_items_controller'),
+  Documents: () => import('#controllers/documents_controller'),
   NewAccount: () => import('#controllers/new_account_controller'),
   Session: () => import('#controllers/session_controller'),
 }

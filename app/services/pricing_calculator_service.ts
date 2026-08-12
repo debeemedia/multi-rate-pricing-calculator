@@ -8,12 +8,15 @@ export class CalculationError extends Error {
 }
 
 export class PricingCalculator {
-  private static toCents(dollars: number): number {
-    return Math.round(dollars * 100)
+  public static toMinorUnit(amountInMainUnit: number): number {
+    return Math.round(amountInMainUnit * 100)
   }
 
-  private static toDollars(cents: number): number {
-    return cents / 100
+  public static toMainUnit(amountInMinorUnit: number | bigint): number {
+    if (typeof amountInMinorUnit === 'bigint') {
+      return Number(amountInMinorUnit) / 100
+    }
+    return amountInMinorUnit / 100
   }
 
   public static calculateLine(item: LineItemInput): CalculatedLineItem {
@@ -35,30 +38,30 @@ export class PricingCalculator {
     }
 
     const qty = item.quantity
-    const unitPriceCents = this.toCents(item.unitPrice)
-    const subtotalCents = qty * unitPriceCents
+    const unitPriceInMinorUnit = this.toMinorUnit(item.unitPrice)
+    const subtotalInMinorUnit = qty * unitPriceInMinorUnit
 
-    let discountCents = 0
+    let discountInMinorUnit = 0
     if (discountType === 'percent') {
       if (discountVal < 0 || discountVal > 100) {
         throw new CalculationError(
           `Discount percent must be between 0 and 100 for line: "${item.description}"`
         )
       }
-      discountCents = Math.round(subtotalCents * (discountVal / 100))
+      discountInMinorUnit = Math.round(subtotalInMinorUnit * (discountVal / 100))
     } else if (discountType === 'fixed') {
-      const fixedDiscountCents = this.toCents(discountVal)
-      if (fixedDiscountCents > subtotalCents) {
+      const fixedDiscountInMinorUnit = this.toMinorUnit(discountVal)
+      if (fixedDiscountInMinorUnit > subtotalInMinorUnit) {
         throw new CalculationError(
-          `Fixed discount ($${discountVal.toFixed(2)}) cannot exceed line subtotal ($${this.toDollars(subtotalCents).toFixed(2)}) for line: "${item.description}"`
+          `Fixed discount ($${discountVal.toFixed(2)}) cannot exceed line subtotal ($${this.toMainUnit(subtotalInMinorUnit).toFixed(2)}) for line: "${item.description}"`
         )
       }
-      discountCents = fixedDiscountCents
+      discountInMinorUnit = fixedDiscountInMinorUnit
     }
 
-    const afterDiscountCents = subtotalCents - discountCents
-    const taxAmountCents = Math.round(afterDiscountCents * (taxPercent / 100))
-    const lineTotalCents = afterDiscountCents + taxAmountCents
+    const afterDiscountInMinorUnit = subtotalInMinorUnit - discountInMinorUnit
+    const taxAmountInMinorUnit = Math.round(afterDiscountInMinorUnit * (taxPercent / 100))
+    const lineTotalInMinorUnit = afterDiscountInMinorUnit + taxAmountInMinorUnit
 
     return {
       description: item.description,
@@ -67,54 +70,49 @@ export class PricingCalculator {
       discountType,
       discountValue: discountVal,
       taxPercent,
-      subtotal: this.toDollars(subtotalCents),
-      discountAmount: this.toDollars(discountCents),
-      afterDiscount: this.toDollars(afterDiscountCents),
-      taxAmount: this.toDollars(taxAmountCents),
-      lineTotal: this.toDollars(lineTotalCents),
+      subtotal: this.toMainUnit(subtotalInMinorUnit),
+      discountAmount: this.toMainUnit(discountInMinorUnit),
+      afterDiscount: this.toMainUnit(afterDiscountInMinorUnit),
+      taxAmount: this.toMainUnit(taxAmountInMinorUnit),
+      lineTotal: this.toMainUnit(lineTotalInMinorUnit),
     }
   }
 
   public static calculateDocument(items: LineItemInput[]): DocumentTotals {
-    //  if (!items || items.length === 0) {
-    //   return {
-    //     subtotal: 0,
-    //     totalDiscount: 0,
-    //     totalTax: 0,
-    //     grandTotal: 0,
-    //     lineItems: [],
-    //   }
-    // }
-
-    // Reject empty or missing line item arrays immediately
-    if (!items || !items.length) {
-      throw new CalculationError('Document must contain at least one line item.')
+    if (!items || items.length === 0) {
+      return {
+        subtotal: 0,
+        totalDiscount: 0,
+        totalTax: 0,
+        grandTotal: 0,
+        lineItems: [],
+      }
     }
 
     const calculatedLines = items.map((item) => this.calculateLine(item))
 
-    const subtotalCents = calculatedLines.reduce(
-      (acc, line) => acc + this.toCents(line.subtotal),
+    const subtotalInMinorUnit = calculatedLines.reduce(
+      (acc, line) => acc + this.toMinorUnit(line.subtotal),
       0
     )
-    const totalDiscountCents = calculatedLines.reduce(
-      (acc, line) => acc + this.toCents(line.discountAmount),
+    const totalDiscountInMinorUnit = calculatedLines.reduce(
+      (acc, line) => acc + this.toMinorUnit(line.discountAmount),
       0
     )
-    const totalTaxCents = calculatedLines.reduce(
-      (acc, line) => acc + this.toCents(line.taxAmount),
+    const totalTaxInMinorUnit = calculatedLines.reduce(
+      (acc, line) => acc + this.toMinorUnit(line.taxAmount),
       0
     )
-    const grandTotalCents = calculatedLines.reduce(
-      (acc, line) => acc + this.toCents(line.lineTotal),
+    const grandTotalInMinorUnit = calculatedLines.reduce(
+      (acc, line) => acc + this.toMinorUnit(line.lineTotal),
       0
     )
 
     return {
-      subtotal: this.toDollars(subtotalCents),
-      totalDiscount: this.toDollars(totalDiscountCents),
-      totalTax: this.toDollars(totalTaxCents),
-      grandTotal: this.toDollars(grandTotalCents),
+      subtotal: this.toMainUnit(subtotalInMinorUnit),
+      totalDiscount: this.toMainUnit(totalDiscountInMinorUnit),
+      totalTax: this.toMainUnit(totalTaxInMinorUnit),
+      grandTotal: this.toMainUnit(grandTotalInMinorUnit),
       lineItems: calculatedLines,
     }
   }

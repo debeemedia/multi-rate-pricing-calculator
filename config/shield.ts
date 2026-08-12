@@ -1,4 +1,5 @@
 import { defineConfig } from '@adonisjs/shield'
+import { isJsonRequest } from '#helpers/http_helper'
 
 /**
  * Security configuration using Shield.
@@ -45,7 +46,11 @@ const shieldConfig = defineConfig({
      * Routes that should be excluded from CSRF protection.
      * Useful for webhooks or API endpoints that use other auth methods.
      */
-    exceptRoutes: [],
+    // exceptRoutes: [],
+    exceptRoutes: (ctx) => {
+      // Exclude CSRF check if the client requests JSON
+      return isJsonRequest(ctx.request)
+    },
 
     /**
      * Enable XSRF-TOKEN cookie for JavaScript frameworks.

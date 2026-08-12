@@ -7,6 +7,68 @@
 import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 
+export class DocumentLineItemSchema extends BaseModel {
+  static $columns = ['createdAt', 'description', 'discount', 'discountType', 'discountValue', 'documentId', 'id', 'lineTotal', 'quantity', 'subtotal', 'tax', 'taxPercent', 'unitPrice', 'updatedAt'] as const
+  $columns = DocumentLineItemSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare description: string
+  @column()
+  declare discount: bigint | number
+  @column()
+  declare discountType: string
+  @column()
+  declare discountValue: bigint | number
+  @column()
+  declare documentId: string
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare lineTotal: bigint | number
+  @column()
+  declare quantity: number
+  @column()
+  declare subtotal: bigint | number
+  @column()
+  declare tax: bigint | number
+  @column()
+  declare taxPercent: string
+  @column()
+  declare unitPrice: bigint | number
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime
+}
+
+export class DocumentSchema extends BaseModel {
+  static $columns = ['createdAt', 'customerName', 'grandTotal', 'id', 'issueDate', 'status', 'subtotal', 'title', 'totalDiscount', 'totalTax', 'updatedAt', 'userId'] as const
+  $columns = DocumentSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare customerName: string
+  @column()
+  declare grandTotal: bigint | number
+  @column({ isPrimary: true })
+  declare id: string
+  @column.dateTime()
+  declare issueDate: DateTime
+  @column()
+  declare status: string
+  @column()
+  declare subtotal: bigint | number
+  @column()
+  declare title: string
+  @column()
+  declare totalDiscount: bigint | number
+  @column()
+  declare totalTax: bigint | number
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime
+  @column()
+  declare userId: string
+}
+
 export class UserSchema extends BaseModel {
   static $columns = ['createdAt', 'email', 'firstName', 'id', 'lastName', 'password', 'updatedAt'] as const
   $columns = UserSchema.$columns
