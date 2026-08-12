@@ -1,3 +1,4 @@
+import { isJsonRequest } from '#helpers/http_helper'
 import User from '#models/user'
 import { signupValidator } from '#validators/user'
 import type { HttpContext } from '@adonisjs/core/http'
@@ -23,6 +24,14 @@ export default class NewAccountController {
     const user = await User.create({ ...payload })
 
     await auth.use('web').login(user)
-    response.redirect().toRoute('home')
+
+    if (isJsonRequest(request)) {
+      return response.created({
+        message: 'Registration successful',
+        data: { id: user.id, email: user.email },
+      })
+    }
+
+    return response.redirect().toRoute('documents.index')
   }
 }

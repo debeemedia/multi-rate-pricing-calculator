@@ -24,9 +24,25 @@ router
   })
   .use(middleware.guest())
 
+// Auth protected routes
 router
   .group(() => {
     router.post('logout', [controllers.Session, 'destroy'])
+
+    // Documents Management Routes
+    router
+      .resource('documents', controllers.Documents)
+      .only(['create', 'destroy', 'index', 'show', 'store', 'update'])
+
+    router
+      .patch('documents/:id/finalize', [controllers.Documents, 'finalize'])
+      .as('documents.finalize') // Finalize a document draft
+
+    // Document Line Items Resourceful Routes
+    router
+      .resource('documents.document_line_items', controllers.DocumentLineItems)
+      .apiOnly()
+      .only(['store', 'destroy'])
   })
   .use(middleware.auth())
 

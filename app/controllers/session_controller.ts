@@ -1,3 +1,4 @@
+import { isJsonRequest } from '#helpers/http_helper'
 import User from '#models/user'
 import type { HttpContext } from '@adonisjs/core/http'
 
@@ -22,14 +23,24 @@ export default class SessionController {
     const user = await User.verifyCredentials(email, password)
 
     await auth.use('web').login(user)
-    response.redirect().toRoute('home')
+
+    if (isJsonRequest(request)) {
+      return response.ok({ message: 'Login successful' })
+    }
+
+    return response.redirect().toRoute('documents.index')
   }
 
   /**
    * Log out the current user and destroy their session
    */
-  async destroy({ auth, response }: HttpContext) {
+  async destroy({ auth, response, request }: HttpContext) {
     await auth.use('web').logout()
-    response.redirect().toRoute('session.create')
+
+    if (isJsonRequest(request)) {
+      return response.ok({ message: 'Logout successful' })
+    }
+
+    return response.redirect().toRoute('session.create')
   }
 }
