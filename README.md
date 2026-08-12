@@ -8,6 +8,11 @@ Live App URL: [https://multi-rate-pricing-calculator-pp8y.onrender.com](https://
 
 Repository: [https://github.com/debeemedia/multi-rate-pricing-calculator](https://github.com/debeemedia/multi-rate-pricing-calculator)
 
+## Tech Stack & Architectural Choices
+
+- **AdonisJS v7 (Node.js):** Selected for its batteries-included, cohesive ecosystem. Having native, first-party modules for authentication, validation (VineJS), ORM (Lucid), templating (Edge), and testing (Japa) eliminated third-party dependency bloat and guaranteed architectural consistency across the monolith.
+- **PostgreSQL:** Chosen for relational data integrity (enforcing foreign keys between documents and line items), transactional safety when locking finalized records, and efficient composite indexing for financial summary queries.
+
 ## Features Implemented
 
 - **Auth & Data Isolation:** Multi-tenant isolation ensuring users can only view, edit, or report on their own documents.
@@ -87,7 +92,7 @@ Below is the test case executed by our test suite (`tests/unit/pricing_calculato
 ### Prerequisites
 
 - **Node.js:** `^20.x` or higher
-- **PostgreSQL**: `^15.x` running locally or via Docker
+- **PostgreSQL**: `^15.x` running locally
 - **Package Manager:** `npm`
 
 ### Step-by-Step Installation
@@ -226,6 +231,11 @@ node ace test unit
 
 - _Tradeoff:_ Simplifies route management and controller logic for a server-rendered application, though dedicated public client API consumption in the future would benefit from strict URI version segregation.
 
+**5. Currency Formatting & Localization Assumptions:**
+- _**Decision:**_ The calculation engine operates strictly on abstract minor integer units (e.g. cents/kobo). HTML views and JSON API outputs default to USD formatting (`$`) for display consistency across demo views.
+  
+- _**Tradeoff:**_ Hardcodes default symbol display in templates rather than supporting dynamic ISO currency codes (e.g. `USD`, `EUR`, `NGN`) per document.
+
 ## What I Would Improve Before Production
 
 **1. Infrastructure & VPS Deployment (Docker & Containerization):**
@@ -237,16 +247,23 @@ node ace test unit
 
 - While unit tests cover the calculation service exhaustively, adding integration test cases for all the API endpoints will ensure that the expected response structure is always returned. Adding browser tests with Playwright for full UI flows e.g. (sign up $\rightarrow$ document list $\rightarrow$ document creation $\rightarrow$ adding line items $\rightarrow$ finalization immutability check) would prevent regression bugs on view interactions.
 
-**3. Asynchronous Export Generation:**
+**3. Multi-Currency & ISO Code Support:**
+- Create a `currencies` table and expand document metadata schema to store an explicit ISO currency code (`USD`, `EUR`, `NGN`) per document, driving minor unit conversions and dynamic currency symbol formatting.
 
-- Implement asynchronous background worker (e.g., BullMQ) for generating downloadable PDF invoices sent via email or direct download links.
+**4. Asynchronous Export Generation:**
 
-**4. Comprehensive Documentation:**
+- Implement asynchronous background worker (e.g. BullMQ) for generating downloadable PDF invoices sent via email or direct download links.
+
+**5. Structured Logging & Application Observability:**
+- Integrate structured logging to track error stacks, database query latency, and audit logs for financial document state changes.
+
+**6. Comprehensive Documentation:**
 
 - Detailed documentation of all API routes, including schema definitions for request payloads and structured success/error response bodies (`201 Created`, `200 OK`, `400 Bad Request`, `422 Unprocessable Entity`).
 
-**5. Dedicated Frontend Styling & Asset Pipeline**
+**7. Dedicated Frontend Styling & Assets:**
 
 - Extract layout styles from inline HTML attributes into organized external CSS components to improve template readability and maintainability.
 - Redesign the default AdonisJS starter homepage to align with the application’s design system and document dashboard UI, providing a cohesive brand experience across all public and authenticated views.
-- Extract repeating layout blocks (e.g., summary metrics cards, status badges, flash message banners) into dedicated Edge UI components to reduce template duplication and streamline future feature updates.
+- Extract repeating layout blocks (e.g. summary metrics cards, status badges, flash message banners) into dedicated Edge UI components to reduce template duplication and streamline future feature updates.
+- Refine dashboard layouts and complex financial tables with responsive horizontal scroll wrappers and stacked card views for seamless mobile and tablet viewports.
