@@ -145,6 +145,51 @@ export default class DocumentService {
   }
 
   /**
+   * Updates metadata (title, customerName, issueDate) for a draft document
+   */
+  async updateDocument(
+    documentId: string,
+    userId: string,
+    data: {
+      title?: string
+      customerName?: string
+      issueDate?: DateTime
+    }
+  ) {
+    const document = await Document.query().where({ id: documentId, userId }).firstOrFail()
+
+    if (document.status === DocumentStatusesEnum.Finalized) {
+      throw new DocumentError('Cannot update a finalized document.')
+    }
+
+    await document.merge(data).save()
+
+    return document
+  }
+
+  /**
+   * Finalizes a draft document and freezes it permanently
+   */
+  public async finalizeDocument(documentId: string, userId: string) {
+    const document = await Document.query()
+      .where({ id: documentId, userId })
+      .preload('documentLineItems')
+      .firstOrFail()
+
+    if (document.status === DocumentStatusesEnum.Finalized) {
+      return document // Already finalized
+    }
+
+    if (!document.documentLineItems || !document.documentLineItems.length) {
+      throw new DocumentError('Cannot finalize a document with zero line items.')
+    }
+
+    await document.merge({ status: DocumentStatusesEnum.Finalized }).save()
+
+    return document
+  }
+
+  /**
    * Adds a new line item to a draft document
    */
   public async addLineItem(documentId: string, userId: string, itemInput: LineItemInput) {
@@ -218,27 +263,5 @@ export default class DocumentService {
 
     // Recalculate and update document totals
     return await this.recalculateDocumentTotals(documentId, trx)
-  }
-
-  /**
-   * Finalizes a draft document and freezes it permanently
-   */
-  public async finalizeDocument(documentId: string, userId: string) {
-    const document = await Document.query()
-      .where({ id: documentId, userId })
-      .preload('documentLineItems')
-      .firstOrFail()
-
-    if (document.status === DocumentStatusesEnum.Finalized) {
-      return document // Already finalized
-    }
-
-    if (!document.documentLineItems || !document.documentLineItems.length) {
-      throw new DocumentError('Cannot finalize a document with zero line items.')
-    }
-
-    await document.merge({ status: DocumentStatusesEnum.Finalized }).save()
-
-    return document
   }
 }
