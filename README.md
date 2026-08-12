@@ -220,6 +220,12 @@ node ace test unit
 
 - _**Tradeoff**_: Simpler session revocation and CSRF protection out of the box for web view forms, though API clients must maintain cookies across requests.
 
+**4. Unified Resource Routing over API Prefixing and Versioning (`/api/v1`):**
+
+- _Decision:_ Routes follow unified resource endpoints (e.g. `/documents`) serving both HTML views and JSON payloads based on content negotiation headers (`Accept: application/json`), omitting explicit `/api/v1` prefix namespaces.
+
+- _Tradeoff:_ Simplifies route management and controller logic for a server-rendered application, though dedicated public client API consumption in the future would benefit from strict URI version segregation.
+
 ## What I Would Improve Before Production
 
 **1. Infrastructure & VPS Deployment (Docker & Containerization):**
