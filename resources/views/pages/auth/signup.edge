@@ -8,8 +8,16 @@
     <div>
       @form({ route: 'new_account.store', method: 'POST' })
         <div>
-          @field.root({ name: 'fullName' })
-            @!field.label({ text: 'Full name' })
+          @field.root({ name: 'firstName' })
+            @!field.label({ text: 'First name' })
+            @!input.control()
+            @!field.error()
+          @end
+        </div>
+
+        <div>
+          @field.root({ name: 'lastName' })
+            @!field.label({ text: 'Last name' })
             @!input.control()
             @!field.error()
           @end
