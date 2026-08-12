@@ -27,11 +27,11 @@ Repository: [https://github.com/debeemedia/multi-rate-pricing-calculator](https:
 
 To eliminate floating-point drift:
 
-- All monetary values (`unit_price`, `subtotal`, `discount_amount`, `tax_amount`, and `line_total`) are stored as integers (BigInt) in minor units (e.g. cents) in PostgreSQL. For example, $100.00 is stored as 10000.
+- All monetary values (`unit_price`, `subtotal`, `discount`, `tax`, and `line_total`) are stored as integers (BigInt) in minor units (e.g. cents) in PostgreSQL. For example, $100.00 is stored as 10000.
 - The `discount_value` column is stored as an integer (BigInt). The application inspects `discount_type` (fixed vs percent) to handle the conversion:
   - If fixed: converted from major unit ($) to minor unit (cents) before storage.
   - If percent: stored directly as the percentage integer/decimal value (e.g., 10 for 10%).
-- Tax percentages (`tax_rate`) are stored as decimal numeric types.
+- Tax percentages (`tax_percent`) are stored as decimal numeric types.
 - Mathematical operations are calculated in minor units e.g. cents. Conversion back to major currency units (/ 100) occurs only when formatting strings for API JSON responses and HTML views.
 
 ### 2. Per-Line Order of Operations
