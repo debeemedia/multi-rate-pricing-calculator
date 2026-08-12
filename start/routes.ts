@@ -38,6 +38,10 @@ router
       .patch('documents/:id/finalize', [controllers.Documents, 'finalize'])
       .as('documents.finalize') // Finalize a document draft
 
+    router
+      .get('documents/reports/summary', [controllers.Documents, 'summaryReport'])
+      .as('documents.summary_report')
+
     // Document Line Items Resourceful Routes
     router
       .resource('documents.document_line_items', controllers.DocumentLineItems)

@@ -17,6 +17,7 @@ export type ScannedRoutes = {
     'documents.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'documents.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'documents.finalize': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'documents.summary_report': { paramsTuple?: []; params?: {} }
     'documents.document_line_items.store': { paramsTuple: [ParamValue]; params: {'document_id': ParamValue} }
     'documents.document_line_items.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'document_id': ParamValue,'id': ParamValue} }
     'health_check': { paramsTuple?: []; params?: {} }
@@ -28,6 +29,7 @@ export type ScannedRoutes = {
     'documents.index': { paramsTuple?: []; params?: {} }
     'documents.create': { paramsTuple?: []; params?: {} }
     'documents.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'documents.summary_report': { paramsTuple?: []; params?: {} }
     'health_check': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
@@ -37,6 +39,7 @@ export type ScannedRoutes = {
     'documents.index': { paramsTuple?: []; params?: {} }
     'documents.create': { paramsTuple?: []; params?: {} }
     'documents.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'documents.summary_report': { paramsTuple?: []; params?: {} }
     'health_check': { paramsTuple?: []; params?: {} }
   }
   POST: {

@@ -15,7 +15,9 @@ export const documentLineItemSchema = vine.object({
 // Felds for document schema
 const titleSchema = vine.string().trim().minLength(1).maxLength(50)
 const customerNameSchema = vine.string().trim().minLength(1).maxLength(50)
-const issueDateSchema = vine.string().transform((value) => DateTime.fromISO(value))
+const issueDateSchema = vine
+  .string()
+  .transform((value) => DateTime.fromISO(value, { zone: 'utc' }).startOf('day'))
 
 /**
  * Validator for Document creation (with optional inline line items)
@@ -45,3 +47,19 @@ export const updateDocumentValidator = vine.create(
  * Validator for creating a line item for a document
  */
 export const createDocumentLineItemValidator = vine.create(documentLineItemSchema)
+
+/**
+ * Validator for Summary Report Date Range Query
+ */
+export const summaryReportValidator = vine.create(
+  vine.object({
+    startDate: vine
+      .string()
+      .transform((val) => DateTime.fromISO(val, { zone: 'utc' }).startOf('day'))
+      .optional(),
+    endDate: vine
+      .string()
+      .transform((val) => DateTime.fromISO(val, { zone: 'utc' }).endOf('day'))
+      .optional(),
+  })
+)

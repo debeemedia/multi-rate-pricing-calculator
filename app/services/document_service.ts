@@ -264,4 +264,38 @@ export default class DocumentService {
     // Recalculate and update document totals
     return await this.recalculateDocumentTotals(documentId, trx)
   }
+
+  /**
+   * Generates Summary Report for Finalized Documents in Date Range
+   */
+  public async getSummaryReport(userId: string, startDate: DateTime, endDate: DateTime) {
+    const startIso = startDate.startOf('day').toISO()
+    const endIso = endDate.endOf('day').toISO()
+
+    const result = await db
+      .from('documents')
+      .where({
+        user_id: userId,
+        status: DocumentStatusesEnum.Finalized,
+      })
+      .whereBetween('issue_date', [startIso!, endIso!])
+      .select(
+        db.raw('COUNT(*)::integer as total_documents'),
+        db.raw('COALESCE(SUM(subtotal), 0) as aggregate_subtotal'),
+        db.raw('COALESCE(SUM(total_discount), 0) as aggregate_total_discount'),
+        db.raw('COALESCE(SUM(total_tax), 0) as aggregate_total_tax'),
+        db.raw('COALESCE(SUM(grand_total), 0) as aggregate_grand_total')
+      )
+      .first()
+
+    return {
+      startDate,
+      endDate,
+      totalDocuments: Number(result.total_documents),
+      aggregateSubtotal: Number(result.aggregate_subtotal),
+      aggregateTotalDiscount: Number(result.aggregate_total_discount),
+      aggregateTotalTax: Number(result.aggregate_total_tax),
+      aggregateGrandTotal: Number(result.aggregate_grand_total),
+    }
+  }
 }
