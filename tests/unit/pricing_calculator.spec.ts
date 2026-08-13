@@ -1,6 +1,6 @@
 import { test } from '@japa/runner'
 import { CalculationError, PricingCalculator } from '#services/pricing_calculator_service'
-import { DiscountTypesEnum } from '#types/index'
+import { DiscountType, DiscountTypesEnum } from '#types/index'
 
 test.group('PricingCalculator', () => {
   test('should test the `calculateDocument` method and return the expected calculation results after discount and tax are applied', ({
@@ -160,4 +160,45 @@ test.group('PricingCalculator', () => {
       `Discount percent must be between 0 and 100 for line: "${description}"`
     )
   }).tags(['pricing_calculator'])
+
+  test(`should test the "calculateLine" method and throw CalculationError when discount value is not 0 and discount type is: ${DiscountTypesEnum.None}`, ({
+    assert,
+  }) => {
+    const description = 'Invalid Discount Value'
+    assert.throws(
+      () =>
+        PricingCalculator.calculateLine({
+          description,
+          quantity: 1,
+          unitPrice: 50,
+          discountType: DiscountTypesEnum.None,
+          discountValue: 200,
+          taxPercent: 10,
+        }),
+      CalculationError,
+      `Discount value must be zero when discount type is "${DiscountTypesEnum.None}" for line: "${description}"`
+    )
+  }).tags(['pricing_calculator'])
+
+  test(
+    'should test the `calculateLine` method and throw CalculationError when discount value is 0 and discount type is: {$self}'
+  )
+    .with([DiscountTypesEnum.Fixed, DiscountTypesEnum.Percent] as DiscountType[])
+    .run(({ assert }, discountType) => {
+      const description = 'Invalid Discount Value'
+      assert.throws(
+        () =>
+          PricingCalculator.calculateLine({
+            description,
+            quantity: 1,
+            unitPrice: 50,
+            discountType: discountType,
+            discountValue: 0,
+            taxPercent: 10,
+          }),
+        CalculationError,
+        `Discount value must be greater than zero when discount type is "${discountType}" for line: "${description}"`
+      )
+    })
+    .tags(['pricing_calculator'])
 })
