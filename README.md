@@ -40,24 +40,36 @@ For every line item, calculations execute in this strict order:
 
 #### (i) Subtotal:
 
-$$\text{Subtotal} = \text{Quantity} \times \text{Unit Price}$$
+```
+Subtotal = Quantity x Unit Price
+```
 
 #### (ii) Discount Calculation & Validation:
 
 - **Percentage Discount:**
-  $$\text{Discount Amount} = \text{Round}\left(\frac{\text{Subtotal} \times \text{Percent}}{100}\right)$$
+  ```
+  Discount Amount = Round((Subtotal x Percent) / 100)
+  ```
 - **Fixed Discount:** Direct fixed cent amount.
 - **Validation Rule:** Fixed discount **must not exceed** the line item's subtotal. If a fixed discount is greater than the subtotal, the API rejects the request with a `400 Bad Request` validation error e.g. `Fixed discount ($100.00) cannot exceed line subtotal ($50.00) for line: "Service fee"`.
 
 #### (iii) Tax Calculation:
 
 Tax is calculated after the discount on the net line amount:
-$$\text{Discounted Subtotal} = \text{Subtotal} - \text{Discount Amount}$$
-$$\text{Tax Amount} = \text{Round}\left(\frac{\text{Discounted Subtotal} \times \text{Tax Rate}}{100}\right)$$
+
+```
+Discounted Subtotal = Subtotal - Discount Amount
+```
+
+```
+Tax Amount = Round((Discounted Subtotal x Tax Percent) / 100)
+```
 
 #### (iv) Line Total:
 
-$$\text{Line Total} = \text{Discounted Subtotal} + \text{Tax Amount}$$
+```
+Line Total = Discounted Subtotal + Tax Amount
+```
 
 #### (v) Rounding Standard:
 
