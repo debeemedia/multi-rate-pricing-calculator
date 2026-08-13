@@ -25,16 +25,18 @@ export class PricingCalculator {
   }
 
   public static calculateLine(item: LineItemInput): CalculatedLineItem {
-    if (item.quantity < 1) {
+    const quantity = Number(item.quantity)
+    const unitPrice = Number(item.unitPrice)
+    const discountVal = Number(item.discountValue || 0)
+    const taxPercent = Number(item.taxPercent || 0)
+    const discountType = item.discountType || DiscountTypesEnum.None
+
+    if (quantity < 1) {
       throw new CalculationError(`Quantity must be at least 1 for line: "${item.description}"`)
     }
-    if (item.unitPrice < 0) {
+    if (unitPrice < 0) {
       throw new CalculationError(`Unit price cannot be negative for line: "${item.description}"`)
     }
-
-    const discountType = item.discountType || DiscountTypesEnum.None
-    const discountVal = item.discountValue || 0
-    const taxPercent = item.taxPercent || 0
 
     if (discountType === DiscountTypesEnum.None) {
       if (discountVal !== 0) {
@@ -56,9 +58,8 @@ export class PricingCalculator {
       )
     }
 
-    const qty = item.quantity
-    const unitPriceInMinorUnit = this.toMinorUnit(item.unitPrice)
-    const subtotalInMinorUnit = qty * unitPriceInMinorUnit
+    const unitPriceInMinorUnit = this.toMinorUnit(unitPrice)
+    const subtotalInMinorUnit = quantity * unitPriceInMinorUnit
 
     let discountInMinorUnit = 0
     if (discountType === 'percent') {
@@ -84,8 +85,8 @@ export class PricingCalculator {
 
     return {
       description: item.description,
-      quantity: item.quantity,
-      unitPrice: item.unitPrice,
+      quantity: quantity,
+      unitPrice: unitPrice,
       discountType,
       discountValue: discountVal,
       taxPercent,

@@ -8,7 +8,7 @@ import DocumentLineItem from '#models/document_line_item'
  * Column transformer for standard currency fields (minor <-> main unit)
  */
 export const moneyColumnConfig: Pick<ColumnOptions, 'consume' | 'prepare'> = {
-  consume: (value: number) => (value ? PricingCalculator.toMainUnit(value) : 0),
+  consume: (value: number) => (value ? PricingCalculator.toMainUnit(Number(value)) : 0),
   prepare: (value: number) => (value ? PricingCalculator.toMinorUnit(value) : 0),
 }
 
@@ -17,9 +17,11 @@ export const moneyColumnConfig: Pick<ColumnOptions, 'consume' | 'prepare'> = {
  */
 export const dynamicDiscountColumnConfig: Pick<ColumnOptions, 'consume' | 'prepare'> = {
   consume: (value: number, _attribute, model: LucidRow) => {
+    const numericValue = Number(value || 0)
+
     return model instanceof DocumentLineItem && model.discountType === DiscountTypesEnum.Fixed
-      ? PricingCalculator.toMainUnit(value)
-      : value
+      ? PricingCalculator.toMainUnit(numericValue)
+      : numericValue
   },
   prepare: (value: number, _attribute, model: any) => {
     return model instanceof DocumentLineItem && model.discountType === DiscountTypesEnum.Fixed
