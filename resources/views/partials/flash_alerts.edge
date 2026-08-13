@@ -1,12 +1,46 @@
 <div class="flash-container">
+  {{-- 1. Standard Single Exception / Domain Error --}}
   @if(flashMessages.has('error'))
-    @alert.root({ variant: 'destructive', autoDismiss: true })
-      @!alert.description({ text: flashMessages.get('error') })
+    @let(domainError = flashMessages.get('error'))
+    @if(typeof domainError === 'string')
+      @alert.root({ variant: 'destructive', autoDismiss: true })
+        @!alert.description({ text: domainError })
+      @end
+    @elseif(typeof domainError === 'object' && domainError !== null)
+      @alert.root({ variant: 'destructive', autoDismiss: true })
+        @!alert.description({ text: domainError.message || JSON.stringify(domainError) })
+      @end
     @end
   @end
+  {{-- 2. Validation Errors (inputErrorsBag) --}}
+  @if(flashMessages.has('inputErrorsBag'))
+    @let(bag = flashMessages.get('inputErrorsBag'))
+    @if(bag && typeof bag === 'object')
+      @alert.root({ variant: 'destructive', autoDismiss: false })
+        <div>
+          <p>Please fix the following validation errors:</p>
+          <ul class="error-list">
+            @each((messages, field) in bag)
+              @if(Array.isArray(messages))
+                @each(message in messages)
+                  <li><strong>{{ field }}:</strong> {{ message }}</li>
+                @end
+              @elseif(typeof messages === 'string')
+                <li><strong>{{ field }}:</strong> {{ messages }}</li>
+              @end
+            @end
+          </ul>
+        </div>
+      @end
+    @end
+  @end
+  {{-- 3. Success Messages --}}
   @if(flashMessages.has('success'))
-    @alert.root({ variant: 'success', autoDismiss: true })
-      @!alert.description({ text: flashMessages.get('success') })
+    @let(successMsg = flashMessages.get('success'))
+    @if(typeof successMsg === 'string')
+      @alert.root({ variant: 'success', autoDismiss: true })
+        @!alert.description({ text: successMsg })
+      @end
     @end
   @end
 </div>

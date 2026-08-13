@@ -1,25 +1,9 @@
-@layout()
+@layout({ suppressFlash: false })
   <div class="document-detail-container">
     {{-- Breadcrumb Navigation --}}
     <div class="mb-4">
       <a href="{{ route('documents.index') }}" class="back-link">← Back to Documents List</a>
     </div>
-    {{-- Domain / Exception errors --}}
-    @if(flashMessages.has('error'))
-      <div class="alert alert-destructive mb-4">{{ flashMessages.get('error') }}</div>
-    @end
-    {{-- Validation errors summary fallback --}}
-    @if(flashMessages.has('inputErrorsBag'))
-      <div class="alert alert-destructive mb-4">
-        <ul class="error-list">
-          @each((messages, field) in flashMessages.get('inputErrorsBag'))
-            @each(message in messages)
-              <li><strong>{{ field }}:</strong> {{ message }}</li>
-            @end
-          @end
-        </ul>
-      </div>
-    @end
     {{-- Document Header --}}
     <div class="document-header-card">
       <div class="header-main">

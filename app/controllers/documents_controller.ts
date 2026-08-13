@@ -66,6 +66,9 @@ export default class DocumentsController {
           return response.badRequest({ message: error.message })
         }
 
+        // Keep all submitted form input in the session after the error is flashed
+        session.flashAll()
+
         session.flash('error', error.message)
 
         return response.redirect().back()

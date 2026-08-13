@@ -5,22 +5,6 @@
         <h1>Create New Document</h1>
         <p>Set up document metadata to begin adding line items, discounts, and custom tax rates.</p>
       </div>
-      {{-- Domain / Exception errors --}}
-      @if(flashMessages.has('error'))
-        <div class="alert alert-destructive">{{ flashMessages.get('error') }}</div>
-      @end
-      {{-- Validation errors summary fallback --}}
-      @if(flashMessages.has('inputErrorsBag'))
-        <div class="alert alert-destructive">
-          <ul class="error-list">
-            @each((messages, field) in flashMessages.get('inputErrorsBag'))
-              @each(message in messages)
-                <li><strong>{{ field }}:</strong> {{ message }}</li>
-              @end
-            @end
-          </ul>
-        </div>
-      @end
 
       <form action="{{ route('documents.store') }}" method="POST">
         {{ csrfField() }}
