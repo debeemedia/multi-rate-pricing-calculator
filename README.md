@@ -161,13 +161,54 @@ To generate `APP_KEY`, run this command and copy the generated key (e.g. `erM2q2
 node ace generate:key --show
 ```
 
-**4. Run Database Migrations:**
+**4. Create the Database:**
+
+Ensure PostgreSQL is running locally, then create the database specified in your `.env` file (e.g. `multi_rate_pricing_calculator`):
+
+- Linux (Ubuntu/Debian):
+
+```bash
+sudo -u postgres createdb multi_rate_pricing_calculator
+```
+
+- macOS (Homebrew):
+
+```bash
+createdb multi_rate_pricing_calculator
+```
+
+- Windows:
+
+```
+createdb -U postgres multi_rate_pricing_calculator
+```
+
+- Via PostgreSQL Interactive Shell (psql):
+
+Connect to `psql`:
+
+```bash
+# Linux:
+sudo -u postgres psql
+
+# macOS / Windows:
+psql -U postgres
+```
+
+Then execute inside the shell:
+
+```sql
+CREATE DATABASE multi_rate_pricing_calculator;
+\q
+```
+
+**5. Run Database Migrations:**
 
 ```bash
 node ace migration:run
 ```
 
-**5. Run the Application:**
+**6. Run the Application:**
 
 ```bash
 npm run dev
