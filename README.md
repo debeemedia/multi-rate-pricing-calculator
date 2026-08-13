@@ -232,9 +232,10 @@ node ace test unit
 - _Tradeoff:_ Simplifies route management and controller logic for a server-rendered application, though dedicated public client API consumption in the future would benefit from strict URI version segregation.
 
 **5. Currency Formatting & Localization Assumptions:**
-- _**Decision:**_ The calculation engine operates strictly on abstract minor integer units (e.g. cents/kobo). HTML views and JSON API outputs default to USD formatting (`$`) for display consistency across demo views.
-  
-- _**Tradeoff:**_ Hardcodes default symbol display in templates rather than supporting dynamic ISO currency codes (e.g. `USD`, `EUR`, `NGN`) per document.
+
+- _**Decision:**_ The calculation engine operates strictly on abstract minor integer units (e.g. cents/kobo). Lucid ORM hooks handle conversions to major units for storage and minor units during serialization. The HTML views default to USD formatting (`$`).
+
+- _**Tradeoff:**_ Documents are currently bound to a single hardcoded currency symbol (`$`) rather than supporting dynamic per-document ISO currency codes (e.g., `USD`, `EUR`, `NGN`).
 
 ## What I Would Improve Before Production
 
@@ -248,13 +249,15 @@ node ace test unit
 - While unit tests cover the calculation service exhaustively, adding integration test cases for all the API endpoints will ensure that the expected response structure is always returned. Adding browser tests with Playwright for full UI flows e.g. (sign up $\rightarrow$ document list $\rightarrow$ document creation $\rightarrow$ adding line items $\rightarrow$ finalization immutability check) would prevent regression bugs on view interactions.
 
 **3. Multi-Currency & ISO Code Support:**
-- Create a `currencies` table and expand document metadata schema to store an explicit ISO currency code (`USD`, `EUR`, `NGN`) per document, driving minor unit conversions and dynamic currency symbol formatting.
+
+- Bind each document to an explicit ISO currency code (`USD`, `EUR`, `NGN`) and record a frozen exchange rate against the account's base currency upon finalization. This enables multi-currency invoicing while allowing account-level summary reports to aggregate with a single base currency.
 
 **4. Asynchronous Export Generation:**
 
 - Implement asynchronous background worker (e.g. BullMQ) for generating downloadable PDF invoices sent via email or direct download links.
 
 **5. Structured Logging & Application Observability:**
+
 - Integrate structured logging to track error stacks, database query latency, and audit logs for financial document state changes.
 
 **6. Comprehensive Documentation:**
