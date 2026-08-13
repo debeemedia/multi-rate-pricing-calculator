@@ -1,4 +1,9 @@
-import { CalculatedLineItem, DocumentTotals, LineItemInput } from '../types/index.ts'
+import {
+  CalculatedLineItem,
+  DiscountTypesEnum,
+  DocumentTotals,
+  LineItemInput,
+} from '../types/index.ts'
 
 export class CalculationError extends Error {
   constructor(message: string) {
@@ -27,9 +32,23 @@ export class PricingCalculator {
       throw new CalculationError(`Unit price cannot be negative for line: "${item.description}"`)
     }
 
-    const discountType = item.discountType || 'none'
+    const discountType = item.discountType || DiscountTypesEnum.None
     const discountVal = item.discountValue || 0
     const taxPercent = item.taxPercent || 0
+
+    if (discountType === DiscountTypesEnum.None) {
+      if (discountVal !== 0) {
+        throw new CalculationError(
+          `Discount value must be zero when discount type is "${discountType}" for line: "${item.description}"`
+        )
+      }
+    } else {
+      if (discountVal <= 0) {
+        throw new CalculationError(
+          `Discount value must be greater than zero when discount type is "${discountType}" for line: "${item.description}"`
+        )
+      }
+    }
 
     if (taxPercent < 0 || taxPercent > 100) {
       throw new CalculationError(
