@@ -249,7 +249,6 @@ button:hover {
   border-color: #00a63e;
 }
 .flash-container {
-  position: fixed;
   top: 80px;
   left: 0;
   right: 0;

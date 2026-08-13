@@ -8,6 +8,7 @@
       </div>
     </div>
     {{-- Error Banner --}}
+    {{-- Ensure to flash the error here since we did not flash in the controller; we used the errorMessage variable. --}}
     @assign(activeError = errorMessage || flashMessages.get('error'))
     @if(activeError)
       <div class="alert alert-destructive mb-4">
