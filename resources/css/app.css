@@ -49,7 +49,8 @@ h6 {
 header {
   max-width: 1440px;
   margin: auto;
-  padding: 0 30px;
+  padding: 0 20px;
+  width: 100%;
 }
 header > div {
   display: flex;
@@ -74,7 +75,8 @@ header nav a.current {
 /* Main */
 main {
   max-width: 1440px;
-  margin: 0 30px;
+  margin: 0 auto;
+  width: calc(100% - 40px); /* Keeps fluid padding on the sides */
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -267,11 +269,48 @@ button:hover {
 }
 
 /* Responsive adjustments for mobile */
+/* Tablet (max-width: 900px) */
+@media (max-width: 900px) {
+  .cards {
+    grid-template-columns: repeat(2, 1fr); /* 2 columns */
+  }
+}
+
 @media (max-width: 600px) {
-  /* Prevent main container from stretching full screen height on mobile */
   main {
     min-height: auto;
-    margin: 0 12px;
+    width: calc(100% - 24px); /* 12px fluid margins on mobile */
+    margin: 0 auto;
+  }
+
+  header {
+    padding: 0 16px;
+  }
+  header nav {
+    gap: 14px; /* Reduced gap from 26px so nav links fit */
+  }
+  header nav a {
+    font-size: 14px;
+  }
+
+  .hero {
+    padding: 40px 16px 16px;
+  }
+  .hero h1 {
+    font-size: 26px; /* Scaled down for mobile screens */
+    letter-spacing: -0.5px;
+  }
+  .hero p {
+    font-size: 15px;
+  }
+
+  .cards {
+    grid-template-columns: 1fr; /* 1 full-width column */
+    padding: 24px 16px 32px;
+    margin-top: 24px;
+  }
+  .card {
+    padding: 20px;
   }
 
   /* Increase top margin on mobile so the form sits comfortably below fixed alerts */
