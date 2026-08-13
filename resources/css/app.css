@@ -1004,6 +1004,27 @@ summary_report.edge styles
   gap: 8px;
 }
 
+/* Report Context Badge */
+.report-context-bar {
+  display: flex;
+  align-items: center;
+}
+
+.context-pill {
+  font-size: 13px;
+  color: var(--gray-8);
+  background: var(--gray-1, #f9fafb);
+  border: 1px solid var(--gray-3, #e5e7eb);
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.context-pill strong {
+  color: var(--gray-12);
+  font-weight: 600;
+  margin-left: 4px;
+}
+
 /* Metrics Grid */
 .metrics-grid {
   display: grid;

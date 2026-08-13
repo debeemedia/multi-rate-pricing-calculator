@@ -49,6 +49,28 @@
         </div>
       </form>
     </div>
+    {{-- Active Date Scope Context Note --}}
+    <div class="report-context-bar mb-3">
+      <span class="context-pill">
+        Showing metrics for:
+        <strong>
+          @if(filters.startDate && filters.endDate)
+            {{ filters.startDate }}
+            to
+            {{ filters.endDate }}
+          @elseif(filters.startDate)
+            From
+            {{ filters.startDate }}
+            onwards
+          @elseif(filters.endDate)
+            Up to
+            {{ filters.endDate }}
+          @else
+            All-Time / Default Range
+          @end
+        </strong>
+      </span>
+    </div>
     {{-- Aggregated Metrics Cards --}}
     <div class="metrics-grid">
       <div class="metric-card">
