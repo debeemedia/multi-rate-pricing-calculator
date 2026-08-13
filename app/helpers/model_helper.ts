@@ -1,4 +1,3 @@
-// app/helpers/model_helpers.ts
 import { ColumnOptions, LucidRow } from '@adonisjs/lucid/types/model'
 import { PricingCalculator } from '#services/pricing_calculator_service'
 import { DiscountTypesEnum } from '#types/index'
