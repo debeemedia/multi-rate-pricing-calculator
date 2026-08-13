@@ -22,7 +22,7 @@
       <form action="{{ route('documents.summary_report') }}" method="GET">
         <div class="report-filter-grid">
           <div class="form-field">
-            <label for="startDate">From Date</label>
+            <label for="startDate">Issue Date From</label>
             <input
               type="date"
               id="startDate"
@@ -32,7 +32,7 @@
           </div>
 
           <div class="form-field">
-            <label for="endDate">To Date</label>
+            <label for="endDate">Issue Date To</label>
             <input
               type="date"
               id="endDate"
@@ -52,21 +52,22 @@
     {{-- Active Date Scope Context Note --}}
     <div class="report-context-bar mb-3">
       <span class="context-pill">
-        Showing metrics for:
+        Showing metrics for documents
+        <strong>issued</strong>
+        between:
         <strong>
           @if(filters.startDate && filters.endDate)
             {{ filters.startDate }}
-            to
+            and
             {{ filters.endDate }}
           @elseif(filters.startDate)
-            From
             {{ filters.startDate }}
             onwards
           @elseif(filters.endDate)
             Up to
             {{ filters.endDate }}
           @else
-            All-Time / Default Range
+            All-Time (Default)
           @end
         </strong>
       </span>
