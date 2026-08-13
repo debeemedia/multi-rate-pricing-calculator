@@ -268,81 +268,6 @@ button:hover {
   }
 }
 
-/* Responsive adjustments for mobile */
-/* Tablet (max-width: 900px) */
-@media (max-width: 900px) {
-  .cards {
-    grid-template-columns: repeat(2, 1fr); /* 2 columns */
-  }
-}
-
-@media (max-width: 600px) {
-  main {
-    min-height: auto;
-    width: calc(100% - 24px); /* 12px fluid margins on mobile */
-    margin: 0 auto;
-  }
-
-  header {
-    padding: 0 16px;
-  }
-  header nav {
-    gap: 14px; /* Reduced gap from 26px so nav links fit */
-  }
-  header nav a {
-    font-size: 14px;
-  }
-
-  .hero {
-    padding: 40px 16px 16px;
-  }
-  .hero h1 {
-    font-size: 26px; /* Scaled down for mobile screens */
-    letter-spacing: -0.5px;
-  }
-  .hero p {
-    font-size: 15px;
-  }
-
-  .cards {
-    grid-template-columns: 1fr; /* 1 full-width column */
-    padding: 24px 16px 32px;
-    margin-top: 24px;
-  }
-  .card {
-    padding: 20px;
-  }
-
-  /* Increase top margin on mobile so the form sits comfortably below fixed alerts */
-  .form-container {
-    margin: 80px auto 32px;
-    padding: 0 16px;
-    width: 100%;
-  }
-
-  .form-container h1 {
-    font-size: 26px;
-  }
-
-  .form-container p {
-    font-size: 15px;
-    margin-bottom: 24px;
-  }
-
-  /* Position alert right under header (64px) with safe clearance */
-  .flash-container {
-    top: 72px;
-    z-index: 999;
-  }
-
-  .alert {
-    min-width: 0;
-    width: calc(100% - 32px);
-    max-width: 380px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  }
-}
-
 /** 
 index.edge styles
 **/
@@ -505,48 +430,6 @@ index.edge styles
   color: #065f46;
 }
 
-/* ==========================================================================
-   Responsive Breakpoints
-   ========================================================================== */
-
-/* Tablet & Mobile Screens */
-@media (max-width: 768px) {
-  .documents-container {
-    padding: 24px 16px;
-  }
-
-  .page-header {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 16px;
-  }
-
-  .page-header h1 {
-    font-size: 26px;
-  }
-
-  .subtitle {
-    font-size: 14px;
-  }
-
-  .header-actions {
-    flex-direction: column;
-    width: 100%;
-  }
-
-  .header-actions .button {
-    width: 100%;
-  }
-}
-
-/* Extra Small Screens */
-@media (max-width: 480px) {
-  .data-table th,
-  .data-table td {
-    padding: 10px 12px;
-  }
-}
-
 /** 
 end of index.edge styles
 **/
@@ -638,36 +521,6 @@ input[type='text']:focus {
 
 .form-actions .button {
   flex: 1;
-}
-
-/* Responsive Form Adjustments */
-@media (max-width: 600px) {
-  .form-page-container {
-    padding: 24px 16px;
-  }
-
-  .form-card {
-    padding: 24px 20px;
-  }
-
-  .form-header h1 {
-    font-size: 22px;
-  }
-
-  .form-actions {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
-  }
-
-  .form-actions .button {
-    width: 100%;
-    flex: none;
-    min-height: 44px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  }
 }
 
 /**
@@ -914,59 +767,8 @@ select:focus {
   margin-left: auto;
 }
 
-/* Responsive Grid Rules */
-@media (max-width: 900px) {
-  .line-item-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  .grid-field.span-2 {
-    grid-column: span 2;
-  }
-}
-
-@media (max-width: 768px) {
-  .edit-details-form {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 600px) {
-  .document-detail-container {
-    padding: 24px 16px;
-  }
-
-  .document-header-card {
-    padding: 20px;
-  }
-
-  .line-item-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .grid-field.span-2 {
-    grid-column: span 1;
-  }
-
-  .totals-box {
-    width: 100%;
-  }
-
-  .document-actions-bar {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .document-actions-bar .button {
-    width: 100%;
-  }
-
-  .ml-auto {
-    margin-left: 0;
-  }
-}
-
 /**
-end of create.edge styles
+end of show.edge styles
  **/
 
 /**
@@ -979,6 +781,9 @@ summary_report.edge styles
   max-width: 1100px;
   margin: 0 auto;
   width: 100%;
+
+  /* Prevents flex space-between from pulling content down */
+  margin-bottom: auto;
 }
 
 .report-header-row {
@@ -1114,31 +919,212 @@ summary_report.edge styles
   margin-left: auto;
 }
 
-/* Responsive Grid Rules */
+/**
+end of summary_report.edge styles 
+**/
+
+/* ==========================================================================
+   Global Responsive Media Queries (Organized from Largest to Smallest Breakpoint)
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Tablet / Desktop Transition (max-width: 900px)
+   -------------------------------------------------------------------------- */
 @media (max-width: 900px) {
-  .metrics-grid {
+  /* Layout & Cards */
+  .cards {
     grid-template-columns: repeat(2, 1fr);
   }
 
+  /* show.edge styles */
+  .line-item-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .grid-field.span-2 {
+    grid-column: span 2;
+  }
+
+  /* summary_report.edge styles */
+  .metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
   .report-filter-grid {
     grid-template-columns: 1fr;
   }
-
   .filter-actions {
     margin-top: 8px;
   }
-
   .filter-actions .button {
     flex: 1;
   }
 }
 
+/* --------------------------------------------------------------------------
+   Standard Tablet / Mobile Landscape (max-width: 768px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  /* index.edge styles */
+  .documents-container {
+    padding: 24px 16px;
+  }
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+  .page-header h1 {
+    font-size: 26px;
+  }
+  .subtitle {
+    font-size: 14px;
+  }
+  .header-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+  .header-actions .button {
+    width: 100%;
+  }
+
+  /* show.edge styles */
+  .edit-details-form {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Mobile Viewports (max-width: 600px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 600px) {
+  /* Layout & Header */
+  main {
+    min-height: auto;
+    width: calc(100% - 24px);
+    margin: 0 auto;
+  }
+  header {
+    padding: 0 16px;
+  }
+  header nav {
+    gap: 14px;
+  }
+  header nav a {
+    font-size: 14px;
+  }
+
+  /* Hero & Cards */
+  .hero {
+    padding: 40px 16px 16px;
+  }
+  .hero h1 {
+    font-size: 26px;
+    letter-spacing: -0.5px;
+  }
+  .hero p {
+    font-size: 15px;
+  }
+  .cards {
+    grid-template-columns: 1fr;
+    padding: 24px 16px 32px;
+    margin-top: 24px;
+  }
+  .card {
+    padding: 20px;
+  }
+
+  /* Form & Alerts */
+  .form-container {
+    margin: 80px auto 32px;
+    padding: 0 16px;
+    width: 100%;
+  }
+  .form-container h1 {
+    font-size: 26px;
+  }
+  .form-container p {
+    font-size: 15px;
+    margin-bottom: 24px;
+  }
+  .flash-container {
+    top: 72px;
+    z-index: 999;
+  }
+  .alert {
+    min-width: 0;
+    width: calc(100% - 32px);
+    max-width: 380px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  /* create.edge styles */
+  .form-page-container {
+    padding: 24px 16px;
+  }
+  .form-card {
+    padding: 24px 20px;
+  }
+  .form-header h1 {
+    font-size: 22px;
+  }
+  .form-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .form-actions .button {
+    width: 100%;
+    flex: none;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* show.edge styles */
+  .document-detail-container {
+    padding: 24px 16px;
+  }
+  .document-header-card {
+    padding: 20px;
+  }
+  .line-item-grid {
+    grid-template-columns: 1fr;
+  }
+  .grid-field.span-2 {
+    grid-column: span 1;
+  }
+  .totals-box {
+    width: 100%;
+  }
+  .document-actions-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .document-actions-bar .button {
+    width: 100%;
+  }
+  .ml-auto {
+    margin-left: 0;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Small Mobile Viewports (max-width: 500px)
+   -------------------------------------------------------------------------- */
 @media (max-width: 500px) {
+  /* summary_report.edge styles */
   .metrics-grid {
     grid-template-columns: 1fr;
   }
 }
 
-/**
-end of summary_report.edge styles 
-**/
+/* --------------------------------------------------------------------------
+   Extra Small / Compact Mobile Viewports (max-width: 480px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 480px) {
+  /* index.edge styles */
+  .data-table th,
+  .data-table td {
+    padding: 10px 12px;
+  }
+}
