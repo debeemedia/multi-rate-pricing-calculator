@@ -101,7 +101,7 @@
               <td>{{ doc.title }}</td>
               <td>{{ doc.customerName }}</td>
               <td><span class="badge {{ doc.status }}">{{ doc.status }}</span></td>
-              <td>${{ (Number(doc.grandTotal) / 100).toFixed(2) }}</td>
+              <td>${{ Number(doc.grandTotal).toFixed(2) }}</td>
               <td><a href="{{ route('documents.show', { id: doc.id }) }}">View</a></td>
             </tr>
           @end

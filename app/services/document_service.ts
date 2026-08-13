@@ -50,10 +50,10 @@ export default class DocumentService {
         await document
           .useTransaction(trx)
           .merge({
-            subtotal: PricingCalculator.toMinorUnit(computed.subtotal),
-            totalDiscount: PricingCalculator.toMinorUnit(computed.totalDiscount),
-            totalTax: PricingCalculator.toMinorUnit(computed.totalTax),
-            grandTotal: PricingCalculator.toMinorUnit(computed.grandTotal),
+            subtotal: computed.subtotal,
+            totalDiscount: computed.totalDiscount,
+            totalTax: computed.totalTax,
+            grandTotal: computed.grandTotal,
           })
           .save()
 
@@ -76,17 +76,14 @@ export default class DocumentService {
               documentId: document.id,
               description,
               quantity,
-              unitPrice: PricingCalculator.toMinorUnit(unitPrice),
+              unitPrice,
               discountType: discountType || DiscountTypesEnum.None,
-              discountValue:
-                discountType === DiscountTypesEnum.Percent
-                  ? discountValue || 0
-                  : PricingCalculator.toMinorUnit(discountValue || 0),
+              discountValue: discountValue || 0,
               taxPercent: (taxPercent || 0).toFixed(2),
-              subtotal: PricingCalculator.toMinorUnit(subtotal),
-              discount: PricingCalculator.toMinorUnit(discountAmount),
-              tax: PricingCalculator.toMinorUnit(taxAmount),
-              lineTotal: PricingCalculator.toMinorUnit(lineTotal),
+              subtotal,
+              discount: discountAmount,
+              tax: taxAmount,
+              lineTotal: lineTotal,
             },
             { client: trx }
           )
@@ -114,16 +111,12 @@ export default class DocumentService {
       throw new DocumentError('Cannot modify or recalculate a finalized document.')
     }
 
-    // Convert stored cents back to LineItemInput format for calculator
     const lineInputs: LineItemInput[] = document.documentLineItems.map((item) => ({
       description: item.description,
       quantity: item.quantity,
-      unitPrice: PricingCalculator.toMainUnit(item.unitPrice),
+      unitPrice: item.unitPrice,
       discountType: item.discountType as DiscountType,
-      discountValue:
-        item.discountType === DiscountTypesEnum.Percent
-          ? Number(item.discountValue)
-          : PricingCalculator.toMainUnit(item.discountValue),
+      discountValue: item.discountValue,
       taxPercent: Number(item.taxPercent),
     }))
 
@@ -134,10 +127,10 @@ export default class DocumentService {
     await document
       .useTransaction(trx)
       .merge({
-        subtotal: PricingCalculator.toMinorUnit(subtotal),
-        totalDiscount: PricingCalculator.toMinorUnit(totalDiscount),
-        totalTax: PricingCalculator.toMinorUnit(totalTax),
-        grandTotal: PricingCalculator.toMinorUnit(grandTotal),
+        subtotal,
+        totalDiscount,
+        totalTax,
+        grandTotal,
       })
       .save()
 
@@ -220,17 +213,14 @@ export default class DocumentService {
           documentId: document.id,
           description,
           quantity,
-          unitPrice: PricingCalculator.toMinorUnit(unitPrice),
+          unitPrice,
           discountType: discountType || DiscountTypesEnum.None,
-          discountValue:
-            discountType === DiscountTypesEnum.Percent
-              ? discountValue || 0
-              : PricingCalculator.toMinorUnit(discountValue || 0),
+          discountValue: discountValue || 0,
           taxPercent: (taxPercent || 0).toFixed(2),
-          subtotal: PricingCalculator.toMinorUnit(subtotal),
-          discount: PricingCalculator.toMinorUnit(discountAmount),
-          tax: PricingCalculator.toMinorUnit(taxAmount),
-          lineTotal: PricingCalculator.toMinorUnit(lineTotal),
+          subtotal,
+          discount: discountAmount,
+          tax: taxAmount,
+          lineTotal,
         },
         { client: trx }
       )
@@ -292,10 +282,11 @@ export default class DocumentService {
       startDate,
       endDate,
       totalDocuments: Number(result.total_documents),
-      aggregateSubtotal: Number(result.aggregate_subtotal),
-      aggregateTotalDiscount: Number(result.aggregate_total_discount),
-      aggregateTotalTax: Number(result.aggregate_total_tax),
-      aggregateGrandTotal: Number(result.aggregate_grand_total),
+      // IMPORTANT: Ensure to convert amount-related columns to main unit since we bypassed the Model
+      aggregateSubtotal: PricingCalculator.toMainUnit(Number(result.aggregate_subtotal)),
+      aggregateTotalDiscount: PricingCalculator.toMainUnit(Number(result.aggregate_total_discount)),
+      aggregateTotalTax: PricingCalculator.toMainUnit(Number(result.aggregate_total_tax)),
+      aggregateGrandTotal: PricingCalculator.toMainUnit(Number(result.aggregate_grand_total)),
     }
   }
 }
