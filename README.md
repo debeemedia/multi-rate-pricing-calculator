@@ -263,10 +263,3 @@ node ace test unit
 **6. Comprehensive Documentation:**
 
 - Detailed documentation of all API routes, including schema definitions for request payloads and structured success/error response bodies (`201 Created`, `200 OK`, `400 Bad Request`, `422 Unprocessable Entity`).
-
-**7. Dedicated Frontend Styling & Assets:**
-
-- Extract layout styles from inline HTML attributes into organized external CSS components to improve template readability and maintainability.
-- Redesign the default AdonisJS starter homepage to align with the application’s design system and document dashboard UI, providing a cohesive brand experience across all public and authenticated views.
-- Extract repeating layout blocks (e.g. summary metrics cards, status badges, flash message banners) into dedicated Edge UI components to reduce template duplication and streamline future feature updates.
-- Refine dashboard layouts and complex financial tables with responsive horizontal scroll wrappers and stacked card views for seamless mobile and tablet viewports.
