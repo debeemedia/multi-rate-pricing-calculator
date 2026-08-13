@@ -27,6 +27,7 @@
               <th>Title</th>
               <th>Customer</th>
               <th>Status</th>
+              <th>Issue Date ↓</th>
               <th class="text-right">Grand Total</th>
               <th class="text-center">Action</th>
             </tr>
@@ -42,6 +43,9 @@
                   >
                     {{ doc.status }}
                   </span>
+                </td>
+                <td class="font-mono text-muted">
+                  {{ doc.issueDate ? doc.issueDate.toFormat('yyyy-MM-dd') : '—' }}
                 </td>
                 <td class="text-right font-mono">${{ Number(doc.grandTotal).toFixed(2) }}</td>
                 <td class="text-center">
