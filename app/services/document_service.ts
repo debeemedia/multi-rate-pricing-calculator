@@ -44,6 +44,8 @@ export default class DocumentService {
       )
 
       // 2. Compute totals if line items provided
+      // Empty drafts can be created without line items (e.g. during initial UI creation flow).
+      // Database defaults handles 0 totals, and no child documentLineItems are created.
       if (lineItems && lineItems.length) {
         const computed = PricingCalculator.calculateDocument(lineItems)
 
@@ -88,10 +90,6 @@ export default class DocumentService {
             { client: trx }
           )
         }
-      } else {
-        // Empty drafts can be created without line items (e.g. during initial UI creation flow).
-        // Database defaults handles 0 totals, and no child documentLineItems are created.
-        await document.useTransaction(trx).save()
       }
 
       return document
