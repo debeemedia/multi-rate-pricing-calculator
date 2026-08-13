@@ -19,6 +19,7 @@ Repository: [https://github.com/debeemedia/multi-rate-pricing-calculator](https:
 - **Server-Side Financial Engine:** Integer-based cent representation avoiding JavaScript IEEE 754 floating-point drift.
 - **Strict Document Lifecycle:** Draft documents are fully editable; finalized documents become immutable across both UI and API levels.
 - **Date-Bounded Summary Reporting:** Aggregates metrics (Total Documents, Revenue, Discounts, Tax) across customizable date ranges, with composite index on relevant columns (`user_id, issue_date, status`) for fast lookups.
+- **Responsive & Intuitive UI:** Modern, mobile-first CSS architecture featuring adaptive grid systems, seamless media query breakpoints, and clear visual navigation across all viewport sizes.
 - **System Health Monitoring:** Exposes a lightweight `GET /health` endpoint for server uptime and database connectivity checks.
 
 ## Calculation & Rounding Policy
