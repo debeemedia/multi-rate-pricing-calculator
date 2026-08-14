@@ -1020,9 +1020,6 @@ end of summary_report.edge styles
   }
 
   /* summary_report.edge styles */
-  .context-pill {
-    margin: auto auto 2px auto;
-  }
   .metrics-grid {
     grid-template-columns: repeat(2, 1fr);
   }
