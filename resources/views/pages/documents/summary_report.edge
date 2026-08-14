@@ -7,8 +7,8 @@
         <h1 class="page-title mt-2">Document Summary Report</h1>
       </div>
     </div>
+
     {{-- Error Banner --}}
-    {{-- Ensure to flash the error here since we did not flash in the controller; we used the errorMessage variable. --}}
     @assign(activeError = errorMessage || flashMessages.get('error'))
     @if(activeError)
       <div class="alert alert-destructive mb-4">
@@ -18,6 +18,7 @@
         </a>
       </div>
     @end
+
     {{-- Filter Form Block --}}
     <div class="card-block mb-4">
       <form action="{{ route('documents.summary_report') }}" method="GET">
@@ -50,8 +51,9 @@
         </div>
       </form>
     </div>
-    {{-- Active Date Scope Context Note --}}
-    <div class="report-context-bar mb-3">
+
+    {{-- Active Date Scope Pill --}}
+    <div class="report-context-bar">
       <span class="context-pill">
         Showing metrics for
         <strong>finalized</strong>
@@ -75,6 +77,12 @@
         </strong>
       </span>
     </div>
+
+    {{-- Calculation Policy Callout Box --}}
+    <div class="policy-callout">
+      <strong>Calculation Policy:</strong> Total Subtotal represents gross line amounts before deductions or taxes. Discounts are deducted first to derive the net taxable amount, after which tax is calculated and added to form the Sum of Grand Totals (final payable total).
+    </div>
+
     {{-- Aggregated Metrics Cards --}}
     <div class="metrics-grid">
       <div class="metric-card">

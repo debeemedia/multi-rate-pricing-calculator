@@ -268,25 +268,31 @@ node ace test unit
 
 - _**Tradeoff:**_ Requires explicit user correction on invalid input, but prevents silent modification of financial figures that could confuse users.
 
-**2. UTC Boundary Normalization for Reports:**
+**2. Document Status Filter in Summary Reporting:**
+
+- _**Decision:**_ The Summary Report (`GET /documents/reports/summary`) aggregates financial metrics exclusively for **`finalized`** documents within the selected `issue_date` range.
+
+- _**Tradeoff:**_ In standard accounting domain design, unfinalized `draft` documents represent mutable estimates that have not been officially issued. Excluding drafts ensures report metrics reflect true realized subtotal, tax liability, and net revenue figures without distortion from incomplete drafts.
+
+**3. UTC Boundary Normalization for Reports:**
 
 - _**Decision:**_ Date filter bounds (`startDate` and `endDate`) are parsed using UTC timezone logic and forcibly expanded: `startDate` defaults to `00:00:00.000` (start of current month) and `endDate` expands to `23:59:59.999` (end of current day).
 
 - _**Tradeoff:**_ Guarantees SQL `BETWEEN` timestamps capture all documents issued on the selected end date without truncating records created later in the day, regardless of server timezone differences.
 
-**3. Session-Based Cookie Authentication over JWT:**
+**4. Session-Based Cookie Authentication over JWT:**
 
 - _**Decision:**_ Used AdonisJS's native session/cookie authentication layer (`@adonisjs/auth`) instead of stateless JWT tokens.
 
 - _**Tradeoff**_: Simpler session revocation and CSRF protection out of the box for web view forms, though API clients must maintain cookies across requests.
 
-**4. Unified Resource Routing over API Prefixing and Versioning (`/api/v1`):**
+**5. Unified Resource Routing over API Prefixing and Versioning (`/api/v1`):**
 
 - _Decision:_ Routes follow unified resource endpoints (e.g. `/documents`) serving both HTML views and JSON payloads based on content negotiation headers (`Accept: application/json`), omitting explicit `/api/v1` prefix namespaces.
 
 - _Tradeoff:_ Simplifies route management and controller logic for a server-rendered application, though dedicated public client API consumption in the future would benefit from strict URI version segregation.
 
-**5. Currency Formatting & Localization Assumptions:**
+**6. Currency Formatting & Localization Assumptions:**
 
 - _**Decision:**_ The calculation engine operates strictly on abstract minor integer units (e.g. cents/kobo). Lucid ORM hooks handle conversions to major units for storage and minor units during serialization. The HTML views default to USD formatting (`$`).
 
