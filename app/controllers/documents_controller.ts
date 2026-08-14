@@ -213,7 +213,6 @@ export default class DocumentsController {
         errorMessage,
         report: {
           totalDocuments: 0,
-          aggregateSubtotal: 0,
           aggregateTotalDiscount: 0,
           aggregateTotalTax: 0,
           aggregateGrandTotal: 0,
