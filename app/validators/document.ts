@@ -1,4 +1,4 @@
-import { discountTypes } from '#types/index'
+import { discountTypes, DiscountTypesEnum } from '#types/index'
 import vine from '@vinejs/vine'
 import { DateTime } from 'luxon'
 
@@ -8,7 +8,34 @@ export const documentLineItemSchema = vine.object({
   quantity: vine.number().min(1),
   unitPrice: vine.number().min(0),
   discountType: vine.enum(discountTypes).optional(),
-  discountValue: vine.number().min(0).optional(),
+  discountValue: vine
+    .number()
+    .min(0)
+    .optional()
+    .transform((value, field) => {
+      const discountType = field.parent.discountType
+
+      if (discountType === DiscountTypesEnum.None && value && value > 0) {
+        field.report(
+          'Cannot provide a discount value when discount type is set to "none"',
+          'invalid_discount_value',
+          field
+        )
+      }
+
+      if (
+        [DiscountTypesEnum.Fixed, DiscountTypesEnum.Percent].includes(discountType) &&
+        (!value || value <= 0)
+      ) {
+        field.report(
+          'Must provide a discount value greater than 0 when discount type is set to "fixed" or "percent"',
+          'invalid_discount_value',
+          field
+        )
+      }
+
+      return value
+    }),
   taxPercent: vine.number().min(0).max(100).optional(),
 })
 

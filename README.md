@@ -27,7 +27,7 @@ To eliminate floating-point drift:
   - If fixed: converted from major unit ($) to minor unit (cents) before storage.
   - If percent: stored directly as the percentage integer/decimal value (e.g., 10 for 10%).
 - Tax percentages (`tax_rate`) are stored as decimal numeric types.
-- Mathematical operations are calculated in minor units e.g. cents. Conversion back to major currency units (/ 100) occurs only when formatting strings for API JSON responses and HTML views.
+- The `PricingCalculatorService` performs all arithmetic in minor units (e.g. cents). Amounts are stored as integer minor units in PostgreSQL and automatically converted to major units by ORM model hooks when hydrated (or manually converted via `PricingCalculatorService` when executing raw SQL queries).
 
 ### 2. Per-Line Order of Operations
 

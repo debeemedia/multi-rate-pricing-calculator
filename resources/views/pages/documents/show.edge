@@ -233,21 +233,21 @@
             <tr>
               <td>{{ item.description }}</td>
               <td>{{ item.quantity }}</td>
-              <td>${{ (Number(item.unitPrice) / 100).toFixed(2) }}</td>
+              <td>${{ Number(item.unitPrice).toFixed(2) }}</td>
               <td>
                 @if(item.discountType === 'percent')
                   {{ item.discountValue }}
                   %
                 @elseif(item.discountType === 'fixed')
                   $
-                  {{ (Number(item.discountValue) / 100).toFixed(2) }}
+                  {{ Number(item.discountValue).toFixed(2) }}
                 @else
                   None
                 @end
               </td>
               <td>{{ item.taxPercent }}%</td>
-              <td>${{ (Number(item.subtotal) / 100).toFixed(2) }}</td>
-              <td><strong>${{ (Number(item.lineTotal) / 100).toFixed(2) }}</strong></td>
+              <td>${{ Number(item.subtotal).toFixed(2) }}</td>
+              <td><strong>${{ Number(item.lineTotal).toFixed(2) }}</strong></td>
               {{-- 2. ADD DELETE FORM COLUMN IF DRAFT --}}
               @if(document.status === 'draft')
                 <td>
@@ -274,19 +274,19 @@
       <div class="totals-box">
         <div class="totals-row">
           <span>Subtotal:</span>
-          <span>${{ (Number(document.subtotal) / 100).toFixed(2) }}</span>
+          <span>${{ Number(document.subtotal).toFixed(2) }}</span>
         </div>
         <div class="totals-row">
           <span>Total Discount:</span>
-          <span>-${{ (Number(document.totalDiscount) / 100).toFixed(2) }}</span>
+          <span>-${{ Number(document.totalDiscount).toFixed(2) }}</span>
         </div>
         <div class="totals-row">
           <span>Total Tax:</span>
-          <span>+${{ (Number(document.totalTax) / 100).toFixed(2) }}</span>
+          <span>+${{ Number(document.totalTax).toFixed(2) }}</span>
         </div>
         <div class="totals-row grand">
           <span>Grand Total:</span>
-          <span>${{ (Number(document.grandTotal) / 100).toFixed(2) }}</span>
+          <span>${{ Number(document.grandTotal).toFixed(2) }}</span>
         </div>
       </div>
     @end

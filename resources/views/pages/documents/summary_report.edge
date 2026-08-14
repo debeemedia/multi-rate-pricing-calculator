@@ -156,17 +156,17 @@
       </div>
       <div class="metric-card">
         <div>Total Revenue</div>
-        <div class="value">${{ (Number(report.aggregateGrandTotal || 0) / 100).toFixed(2) }}</div>
+        <div class="value">${{ Number(report.aggregateGrandTotal || 0).toFixed(2) }}</div>
       </div>
       <div class="metric-card">
         <div>Total Discounts</div>
         <div class="value">
-          -${{ (Number(report.aggregateTotalDiscount || 0) / 100).toFixed(2) }}
+          -${{ Number(report.aggregateTotalDiscount || 0).toFixed(2) }}
         </div>
       </div>
       <div class="metric-card">
         <div>Total Tax Collected</div>
-        <div class="value">${{ (Number(report.aggregateTotalTax || 0) / 100).toFixed(2) }}</div>
+        <div class="value">${{ Number(report.aggregateTotalTax || 0).toFixed(2) }}</div>
       </div>
     </div>
   </body>
