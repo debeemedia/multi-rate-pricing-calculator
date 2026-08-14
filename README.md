@@ -225,7 +225,7 @@ Access the web app at http://localhost:3333.
 The application controller architecture supports **both web browsers and REST API clients**:
 
 - **Web Navigation (HTML Views):** Standard browser requests render server-side Edge templates (`view.render(...)`).
-- **API Clients (JSON Responses):** Requests including an `Accept: application/json` header bypass template rendering and return pure JSON payloads with proper HTTP status codes (`200 OK`, `400 Bad Request`, `422 Unprocessable Entity`).
+- **API Clients (JSON Responses):** Requests including an `Accept: application/json` header bypass template rendering and return pure JSON payloads with proper HTTP status codes.
 
 ## Testing API Endpoints (Thunder Client / Postman)
 
@@ -242,15 +242,180 @@ Content-Type: application/json
 
 ### Recommended: Thunder Client / Postman
 
-1. Send a `POST` request to `/login` with your user credentials.
+1. (a) Send a `POST` request to `/signup` with your user payload.
+
+```json
+{
+  "email": "yourmail@gmail.com",
+  "password": "yourpassword",
+  "passwordConfirmation": "yourpassword",
+  // optional
+  "firstName": "First Name",
+  "lastName": "Last Name"
+}
+```
+
+OR if already registered:
+
+1. (b) Send a `POST` request to `/login` with your user credentials.
+
+```json
+{
+  "email": "yourmail@gmail.com",
+  "password": "yourpassword"
+}
+```
+
 2. The client will automatically store the HTTP-only session cookie in its cookie jar.
-3. Make subsequent requests (e.g., `GET /documents/reports/summary`) adding the header:
+
+3. Make subsequent requests (e.g. `GET /documents/reports/summary`) adding the header:
 
 ```http
 Accept: application/json
 ```
 
 > **Note on Authentication:** _Authentication uses HTTP-only cookie sessions. When testing authenticated routes in Thunder Client or Postman, ensure you run the Login request first so your cookie jar automatically stores and forwards the session cookie._
+
+4. Send a `POST` request to `/logout` to logout of a session.
+
+## CRUD Endpoints Summary
+
+All requests expecting JSON payloads must include the `Accept: application/json` (MUST!) and `Content-Type: application/json` headers.
+
+Standard RESTful HTTP status codes (`200 OK`, `201 Created`, `400 Bad Request`, `404 Not Found`, `422 Unprocessable Entity` `401 Unauthorized` etc.) are returned.
+
+The base URL for all API requests is: `https://multi-rate-pricing-calculator-pp8y.onrender.com`
+
+### Documents (`/documents`)
+
+| Method   | Endpoint                  | Description                                                                |
+| :------- | :------------------------ | :------------------------------------------------------------------------- |
+| `POST`   | `/documents`              | Create a new document (with optional inline line items)                    |
+| `GET`    | `/documents`              | List all documents                                                         |
+| `GET`    | `/documents/:id`          | Fetch a single document by ID                                              |
+| `PUT`    | `/documents/:id`          | Update document details (`title`, `customerName`, `issueDate`)             |
+| `PATCH`  | `/documents/:id/finalize` | Mark document `status` as `finalized`. Cannot be modified or deleted after |
+| `DELETE` | `/documents/:id`          | Delete a document and its associated line items                            |
+
+---
+
+### Document Line Items (`/documents/:document_id/document_line_items`)
+
+| Method   | Endpoint                                          | Description                        |
+| :------- | :------------------------------------------------ | :--------------------------------- |
+| `POST`   | `/documents/:document_id/document_line_items`     | Add a line item to a document      |
+| `DELETE` | `/documents/:document_id/document_line_items/:id` | Remove a line item from a document |
+
+---
+
+### Summary Reports
+
+| Method | Endpoint                     | Description                                                                   |
+| :----- | :--------------------------- | :---------------------------------------------------------------------------- |
+| `GET`  | `/documents/reports/summary` | Query summary report with optional `startDate` and `endDate` ISO query params |
+
+---
+
+### Example Payloads
+
+<details>
+<summary><b>Create Document (POST /documents)</b></summary>
+
+```json
+{
+  "title": "Invoice #1001",
+  "customerName": "Acme Corp",
+  "issueDate": "2026-08-14",
+  // optional
+  "lineItems": [
+    {
+      "description": "Software Architecture Consulting",
+      "quantity": 10,
+      "unitPrice": 150.0,
+      "discountType": "percent",
+      "discountValuePercent": 10,
+      "taxPercent": 7.5
+    }
+  ]
+}
+```
+
+Success Response: 201 Created
+
+```json
+{
+  "message": "Document created successfully",
+  "data": {
+    "userId": "bbb11281-b96e-4a46-8018-f6fae2f672bf",
+    "title": "Invoice #1001",
+    "customerName": "Acme Corp",
+    "issueDate": "2026-08-14T00:00:00.000Z",
+    "status": "draft",
+    "id": "5b5ded4b-810e-42c5-aff9-b4dd2b6a5061",
+    "createdAt": "2026-08-14T14:10:25.312+00:00",
+    "updatedAt": "2026-08-14T14:10:25.313+00:00",
+    "subtotal": 1500,
+    "totalDiscount": 150,
+    "totalTax": 101.25,
+    "grandTotal": 1451.25
+  }
+}
+```
+
+Error Responses:
+Validation and Domain errors are also returned.
+
+</details>
+
+<details>
+<summary><b>Create Document Line Item (POST /documents/:document_id/document_line_items)</b></summary>
+
+```json
+{
+  "description": "Cloud Hosting Setup",
+  "quantity": 1,
+  "unitPrice": 250.0,
+  "discountType": "fixed",
+  "discountValueFixed": 50.0,
+  "taxPercent": 5.0
+}
+```
+
+| `discountType` | Discount Value column                                                      | Description                        |
+| :------------- | :------------------------------------------------------------------------- | :--------------------------------- |
+| `fixed`        | `discountValueFixed` must be provided                                      | Represents the discount amount     |
+| `percent`      | `discountValuePercent` must be provided                                    | Represents the discount percentage |
+| `none`         | Neither `discountValueFixed` nor `discountValuePercent` should be provided | No discount                        |
+
+Success Response: 201 Created
+
+```json
+{
+  "message": "Line item added successfully",
+  "data": {
+    "documentId": "5b5ded4b-810e-42c5-aff9-b4dd2b6a5061",
+    "description": "Cloud Hosting Setup",
+    "quantity": 1,
+    "unitPrice": 250,
+    "discountType": "fixed",
+    "discountValueFixed": 50,
+    "discountValuePercent": null,
+    "taxPercent": "5.00",
+    "subtotal": 250,
+    "discount": 50,
+    "tax": 10,
+    "lineTotal": 210,
+    "id": "bee05c3b-e60c-46f6-9d09-eafaca86352b",
+    "createdAt": "2026-08-14T14:20:12.830+00:00",
+    "updatedAt": "2026-08-14T14:20:12.830+00:00"
+  }
+}
+```
+
+Error Responses:
+Validation and Domain errors are also returned.
+
+</details>
 
 ## Running Unit Tests
 
@@ -323,6 +488,7 @@ node ace test unit
 
 - Integrate structured logging to track error stacks, database query latency, and audit logs for financial document state changes.
 
-**6. Comprehensive Documentation:**
+**6. Comprehensive and Interactive API Documentation:**
 
-- Detailed documentation of all API routes, including schema definitions for request payloads and structured success/error response bodies (`201 Created`, `200 OK`, `400 Bad Request`, `422 Unprocessable Entity`).
+- Basic API routes and payload examples are already documented in this README for quick testing.
+- Full request validation and edge case handling (e.g. negative quantities, invalid discounts, finalized document rules etc.) are already implemented in code. Future work will focus on adding interactive Swagger/OpenAPI docs for deeper inspection.
