@@ -2,15 +2,36 @@ import { discountTypes, DiscountTypesEnum } from '#types/index'
 import vine from '@vinejs/vine'
 import { DateTime } from 'luxon'
 
+/**
+ * Custom rule: Enforces at most 2 decimal places (e.g. 10.50 is valid, 10.555 is invalid)
+ */
+const maxTwoDecimals = vine.createRule((value, _, field) => {
+  if (typeof value !== 'number' || Number.isNaN(value)) {
+    return
+  }
+
+  // Multiply by 100 and check if it's an integer (handles floating point precision safely)
+  const isTwoDecimalsOrLess = Number.isInteger(Math.round(value * 1000000) / 10000)
+
+  if (!isTwoDecimalsOrLess) {
+    field.report(
+      `The ${field.name} field cannot have more than 2 decimal places`,
+      'max_two_decimals',
+      field
+    )
+  }
+})
+
 // Document line item schema
 export const documentLineItemSchema = vine.object({
   description: vine.string().trim().minLength(1).maxLength(100),
   quantity: vine.number().min(1),
-  unitPrice: vine.number().min(0),
+  unitPrice: vine.number().min(0).use(maxTwoDecimals()),
   discountType: vine.enum(discountTypes).optional(),
   discountValueFixed: vine
     .number()
     .min(0)
+    .use(maxTwoDecimals())
     .nullable()
     .optional()
     .transform((value, field) => {
@@ -53,6 +74,7 @@ export const documentLineItemSchema = vine.object({
     .number()
     .min(0)
     .max(100)
+    .use(maxTwoDecimals())
     .nullable()
     .optional()
     .transform((value, field) => {
@@ -91,10 +113,10 @@ export const documentLineItemSchema = vine.object({
 
       return value ?? null
     }),
-  taxPercent: vine.number().min(0).max(100).optional(),
+  taxPercent: vine.number().min(0).max(100).use(maxTwoDecimals()).optional(),
 })
 
-// Felds for document schema
+// Fields for document schema
 const titleSchema = vine.string().trim().minLength(1).maxLength(50)
 const customerNameSchema = vine.string().trim().minLength(1).maxLength(50)
 const issueDateSchema = vine
@@ -118,7 +140,7 @@ export const createDocumentValidator = vine.create(
  */
 export const updateDocumentValidator = vine.create(
   vine.object({
-    // CLone so as not to mutate the original
+    // Clone so as not to mutate the original
     title: titleSchema.clone().optional(),
     customerName: customerNameSchema.clone().optional(),
     issueDate: issueDateSchema.clone().optional(),
