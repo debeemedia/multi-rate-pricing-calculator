@@ -84,6 +84,7 @@
 
       <div class="metric-card">
         <span class="metric-label">Total Subtotal</span>
+        <div><small>(Before discounts & tax)</small></div>
         <span class="metric-value font-mono">
           ${{ Number(report.aggregateSubtotal || 0).toFixed(2) }}
         </span>
@@ -105,6 +106,7 @@
 
       <div class="metric-card highlight">
         <span class="metric-label">Sum of Grand Totals</span>
+        <div><small>(Net revenue after discounts & tax)</small></div>
         <span class="metric-value font-mono">
           ${{ Number(report.aggregateGrandTotal || 0).toFixed(2) }}
         </span>
