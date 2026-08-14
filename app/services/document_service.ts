@@ -214,12 +214,6 @@ export default class DocumentService {
         taxPercent,
       } = calculated
 
-      console.log('Payload passing to Lucid:', {
-        discountType: calculated.discountType,
-        discountValueFixed: calculated.discountValueFixed,
-        discountValuePercent: calculated.discountValuePercent,
-      })
-
       const lineItem = await DocumentLineItem.create(
         {
           documentId: document.id,
@@ -287,7 +281,6 @@ export default class DocumentService {
       .whereBetween('issue_date', [startIso!, endIso!])
       .select(
         db.raw('COUNT(*)::integer as total_documents'),
-        db.raw('COALESCE(SUM(subtotal), 0) as aggregate_subtotal'),
         db.raw('COALESCE(SUM(total_discount), 0) as aggregate_total_discount'),
         db.raw('COALESCE(SUM(total_tax), 0) as aggregate_total_tax'),
         db.raw('COALESCE(SUM(grand_total), 0) as aggregate_grand_total')
@@ -299,7 +292,6 @@ export default class DocumentService {
       endDate,
       totalDocuments: Number(result.total_documents),
       // IMPORTANT: Ensure to convert amount-related columns to main unit since we bypassed the Model
-      aggregateSubtotal: PricingCalculator.toMainUnit(Number(result.aggregate_subtotal)),
       aggregateTotalDiscount: PricingCalculator.toMainUnit(Number(result.aggregate_total_discount)),
       aggregateTotalTax: PricingCalculator.toMainUnit(Number(result.aggregate_total_tax)),
       aggregateGrandTotal: PricingCalculator.toMainUnit(Number(result.aggregate_grand_total)),
