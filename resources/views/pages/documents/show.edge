@@ -104,11 +104,11 @@
                   <td class="text-right font-mono">${{ Number(item.unitPrice).toFixed(2) }}</td>
                   <td class="text-right font-mono">
                     @if(item.discountType === 'percent')
-                      {{ item.discountValue }}
+                      {{ item.discountValuePercent }}
                       %
                     @elseif(item.discountType === 'fixed')
                       $
-                      {{ Number(item.discountValue).toFixed(2) }}
+                      {{ Number(item.discountValueFixed).toFixed(2) }}
                     @else
                       None
                     @end
@@ -217,8 +217,11 @@
 
             <div class="grid-field">
               <label for="item-discount-type">Discount Type</label>
-              <select id="item-discount-type" name="discountType">
-                <option value="none" {{ old('discountType') === 'none' ? 'selected' : '' }}>
+              <select id="item-discount-type" name="discountType" onchange="toggleDiscountInputs()">
+                <option
+                  value="none"
+                  {{ old('discountType') === 'none' || !old('discountType') ? 'selected' : '' }}
+                >
                   No Discount
                 </option>
                 <option value="fixed" {{ old('discountType') === 'fixed' ? 'selected' : '' }}>
@@ -230,15 +233,27 @@
               </select>
             </div>
 
-            <div class="grid-field">
-              <label for="item-discount-val">Discount Val</label>
+            <div class="grid-field" id="discount-fixed-container">
+              <label for="item-discount-fixed">Discount ($)</label>
               <input
                 type="number"
-                id="item-discount-val"
+                id="item-discount-fixed"
                 step="0.01"
-                name="discountValue"
+                name="discountValueFixed"
                 placeholder="0.00"
-                value="{{ old('discountValue') || '0' }}"
+                value="{{ old('discountValueFixed') || '' }}"
+              />
+            </div>
+
+            <div class="grid-field" id="discount-percent-container">
+              <label for="item-discount-percent">Discount (%)</label>
+              <input
+                type="number"
+                id="item-discount-percent"
+                step="0.01"
+                name="discountValuePercent"
+                placeholder="0.00"
+                value="{{ old('discountValuePercent') || '' }}"
               />
             </div>
 
@@ -258,6 +273,34 @@
           <div class="mt-4"><button type="submit" class="button">+ Add Line Item</button></div>
         </form>
       </div>
+
+      <script>
+        function toggleDiscountInputs() {
+          const type = document.getElementById('item-discount-type').value;
+          const fixedContainer = document.getElementById('discount-fixed-container');
+          const percentContainer = document.getElementById('discount-percent-container');
+          const fixedInput = document.getElementById('item-discount-fixed');
+          const percentInput = document.getElementById('item-discount-percent');
+
+          if (type === 'fixed') {
+            fixedContainer.style.display = 'block';
+            percentContainer.style.display = 'none';
+            percentInput.value = '';
+          } else if (type === 'percent') {
+            fixedContainer.style.display = 'none';
+            percentContainer.style.display = 'block';
+            fixedInput.value = '';
+          } else {
+            fixedContainer.style.display = 'none';
+            percentContainer.style.display = 'none';
+            fixedInput.value = '';
+            percentInput.value = '';
+          }
+        }
+
+        // Initialize display state on load
+        document.addEventListener('DOMContentLoaded', toggleDiscountInputs);
+      </script>
       {{-- Action Bar --}}
       <div class="document-actions-bar">
         @if(document.documentLineItems.length)

@@ -27,31 +27,26 @@ export class PricingCalculator {
   public static calculateLine(item: LineItemInput): CalculatedLineItem {
     const quantity = Number(item.quantity)
     const unitPrice = Number(item.unitPrice)
-    const discountVal = Number(item.discountValue || 0)
     const taxPercent = Number(item.taxPercent || 0)
     const discountType = item.discountType || DiscountTypesEnum.None
 
+    const fixedVal =
+      item.discountValueFixed !== null && item.discountValueFixed !== undefined
+        ? Number(item.discountValueFixed)
+        : null
+
+    const percentVal =
+      item.discountValuePercent !== null && item.discountValuePercent !== undefined
+        ? Number(item.discountValuePercent)
+        : null
+
+    // 1. Basic Line Validations
     if (quantity < 1) {
       throw new CalculationError(`Quantity must be at least 1 for line: "${item.description}"`)
     }
     if (unitPrice < 0) {
       throw new CalculationError(`Unit price cannot be negative for line: "${item.description}"`)
     }
-
-    if (discountType === DiscountTypesEnum.None) {
-      if (discountVal !== 0) {
-        throw new CalculationError(
-          `Discount value must be zero when discount type is "${discountType}" for line: "${item.description}"`
-        )
-      }
-    } else {
-      if (discountVal <= 0) {
-        throw new CalculationError(
-          `Discount value must be greater than zero when discount type is "${discountType}" for line: "${item.description}"`
-        )
-      }
-    }
-
     if (taxPercent < 0 || taxPercent > 100) {
       throw new CalculationError(
         `Tax percent must be between 0 and 100 for line: "${item.description}"`
@@ -60,35 +55,61 @@ export class PricingCalculator {
 
     const unitPriceInMinorUnit = this.toMinorUnit(unitPrice)
     const subtotalInMinorUnit = quantity * unitPriceInMinorUnit
-
     let discountInMinorUnit = 0
-    if (discountType === 'percent') {
-      if (discountVal < 0 || discountVal > 100) {
+
+    // 2. Strict Discount Type & Mutual Exclusivity Validation
+    if (discountType === DiscountTypesEnum.None) {
+      if (fixedVal !== null || percentVal !== null) {
         throw new CalculationError(
-          `Discount percent must be between 0 and 100 for line: "${item.description}"`
+          `Both discount fields must be null when discount type is "${DiscountTypesEnum.None}" for line: "${item.description}"`
         )
       }
-      discountInMinorUnit = Math.round(subtotalInMinorUnit * (discountVal / 100))
-    } else if (discountType === 'fixed') {
-      const fixedDiscountInMinorUnit = this.toMinorUnit(discountVal)
+    } else if (discountType === DiscountTypesEnum.Fixed) {
+      if (fixedVal === null || fixedVal === undefined || fixedVal <= 0) {
+        throw new CalculationError(
+          `Fixed discount value must be provided and greater than 0 when discount type is "${DiscountTypesEnum.Fixed}" for line: "${item.description}"`
+        )
+      }
+      if (percentVal !== null) {
+        throw new CalculationError(
+          `Percentage discount value must be null when discount type is "${DiscountTypesEnum.Fixed}" for line: "${item.description}"`
+        )
+      }
+
+      const fixedDiscountInMinorUnit = this.toMinorUnit(fixedVal)
       if (fixedDiscountInMinorUnit > subtotalInMinorUnit) {
         throw new CalculationError(
-          `Fixed discount ($${discountVal.toFixed(2)}) cannot exceed line subtotal ($${this.toMainUnit(subtotalInMinorUnit).toFixed(2)}) for line: "${item.description}"`
+          `Fixed discount ($${fixedVal.toFixed(2)}) cannot exceed line subtotal ($${this.toMainUnit(subtotalInMinorUnit).toFixed(2)}) for line: "${item.description}"`
         )
       }
       discountInMinorUnit = fixedDiscountInMinorUnit
+    } else if (discountType === DiscountTypesEnum.Percent) {
+      if (percentVal === null || percentVal === undefined || percentVal <= 0 || percentVal > 100) {
+        throw new CalculationError(
+          `Percentage discount value must be greater than 0 and at most 100 when discount type is "${DiscountTypesEnum.Percent}" for line: "${item.description}"`
+        )
+      }
+      if (fixedVal !== null) {
+        throw new CalculationError(
+          `Fixed discount value must be null when discount type is "${DiscountTypesEnum.Percent}" for line: "${item.description}"`
+        )
+      }
+
+      discountInMinorUnit = Math.round(subtotalInMinorUnit * (percentVal / 100))
     }
 
+    // 3. Totals Breakdown
     const afterDiscountInMinorUnit = subtotalInMinorUnit - discountInMinorUnit
     const taxAmountInMinorUnit = Math.round(afterDiscountInMinorUnit * (taxPercent / 100))
     const lineTotalInMinorUnit = afterDiscountInMinorUnit + taxAmountInMinorUnit
 
     return {
       description: item.description,
-      quantity: quantity,
-      unitPrice: unitPrice,
+      quantity,
+      unitPrice,
       discountType,
-      discountValue: discountVal,
+      discountValueFixed: fixedVal,
+      discountValuePercent: percentVal,
       taxPercent,
       subtotal: this.toMainUnit(subtotalInMinorUnit),
       discountAmount: this.toMainUnit(discountInMinorUnit),
