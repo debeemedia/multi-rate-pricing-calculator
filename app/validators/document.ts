@@ -10,7 +10,7 @@ const stripTags = vine.createRule((value, _options, field) => {
     const cleanValue = value.replace(/<[^>]*>?/gm, '')
     field.mutate(cleanValue)
   }
-})
+}, { isAsync: false })
 
 /**
  * Custom rule: Enforces at most 2 decimal places (e.g. 10.50 is valid, 10.555 is invalid)
