@@ -1,6 +1,6 @@
 # Multi-Rate Pricing Calculator
 
-A web application built with AdonisJS v6, TypeScript, and PostgreSQL that lets users manage documents, compute multi-rate line-item discounts and taxes server-side, maintain strict lifecycle immutability for finalized documents, and generate summary reports.
+A web application built with AdonisJS v7, TypeScript, and PostgreSQL that lets users manage documents, compute multi-rate line-item discounts and taxes server-side, maintain strict lifecycle immutability for finalized documents, and generate summary reports.
 
 ## Live Demo & Repository
 
@@ -8,12 +8,18 @@ Live App URL: [https://multi-rate-pricing-calculator-pp8y.onrender.com](https://
 
 Repository: [https://github.com/debeemedia/multi-rate-pricing-calculator](https://github.com/debeemedia/multi-rate-pricing-calculator)
 
+## Tech Stack & Architectural Choices
+
+- **AdonisJS v7 (Node.js):** Selected for its batteries-included, cohesive ecosystem. Having native, first-party modules for authentication, validation (VineJS), ORM (Lucid), templating (Edge), and testing (Japa) eliminated third-party dependency bloat and guaranteed architectural consistency across the monolith.
+- **PostgreSQL:** Chosen for relational data integrity (enforcing foreign keys between documents and line items), transactional safety when locking finalized records, dynamic check constraints, and efficient composite indexing for financial summary queries.
+
 ## Features Implemented
 
 - **Auth & Data Isolation:** Multi-tenant isolation ensuring users can only view, edit, or report on their own documents.
 - **Server-Side Financial Engine:** Integer-based cent representation avoiding JavaScript IEEE 754 floating-point drift.
 - **Strict Document Lifecycle:** Draft documents are fully editable; finalized documents become immutable across both UI and API levels.
 - **Date-Bounded Summary Reporting:** Aggregates metrics (Total Documents, Revenue, Discounts, Tax) across customizable date ranges, with composite index on relevant columns (`user_id, issue_date, status`) for fast lookups.
+- **Responsive & Intuitive UI:** Modern, mobile-first CSS architecture featuring adaptive grid systems, seamless media query breakpoints, and clear visual navigation across all viewport sizes.
 - **System Health Monitoring:** Exposes a lightweight `GET /health` endpoint for server uptime and database connectivity checks.
 
 ## Calculation & Rounding Policy
@@ -22,12 +28,13 @@ Repository: [https://github.com/debeemedia/multi-rate-pricing-calculator](https:
 
 To eliminate floating-point drift:
 
-- All monetary values (`unit_price`, `subtotal`, `discount_amount`, `tax_amount`, and `line_total`) are stored as integers (BigInt) in minor units (e.g. cents) in PostgreSQL. For example, $100.00 is stored as 10000.
-- The `discount_value` column is stored as an integer (BigInt). The application inspects `discount_type` (fixed vs percent) to handle the conversion:
-  - If fixed: converted from major unit ($) to minor unit (cents) before storage.
-  - If percent: stored directly as the percentage integer/decimal value (e.g., 10 for 10%).
-- Tax percentages (`tax_rate`) are stored as decimal numeric types.
-- The `PricingCalculatorService` performs all arithmetic in minor units (e.g. cents). Amounts are stored as integer minor units in PostgreSQL and automatically converted to major units by ORM model hooks when hydrated (or manually converted via `PricingCalculatorService` when executing raw SQL queries).
+- All monetary values (`unit_price`, `subtotal`, `discount`, `tax`, and `line_total`) are stored as integers (BigInt) in minor units (e.g. cents) in PostgreSQL. For example, $100.00 is stored as `10000`.
+- Discounts use mutually exclusive columns governed by database check constraints:
+  - `discount_value_fixed`: Stored as integer minor units (cents) when `discount_type` is `'fixed'`.
+  - `discount_value_percent`: Stored as a decimal numeric type when `discount_type` is `'percent'`.
+  - When `discount_type` is `'none'`, both columns evaluate to `NULL`.
+- Tax percentages (`tax_percent`) are stored as decimal numeric types.
+- The `PricingCalculatorService` is the single source of truth for all arithmetic. Column transformers, via the service, convert values between minor units for database storage and major units (dollars) for model consumption.
 
 ### 2. Per-Line Order of Operations
 
@@ -35,24 +42,36 @@ For every line item, calculations execute in this strict order:
 
 #### (i) Subtotal:
 
-$$\text{Subtotal} = \text{Quantity} \times \text{Unit Price}$$
+```
+Subtotal = Quantity x Unit Price
+```
 
 #### (ii) Discount Calculation & Validation:
 
 - **Percentage Discount:**
-  $$\text{Discount Amount} = \text{Round}\left(\frac{\text{Subtotal} \times \text{Percent}}{100}\right)$$
+  ```
+  Discount Amount = Round((Subtotal x Percent) / 100)
+  ```
 - **Fixed Discount:** Direct fixed cent amount.
 - **Validation Rule:** Fixed discount **must not exceed** the line item's subtotal. If a fixed discount is greater than the subtotal, the API rejects the request with a `400 Bad Request` validation error e.g. `Fixed discount ($100.00) cannot exceed line subtotal ($50.00) for line: "Service fee"`.
 
 #### (iii) Tax Calculation:
 
 Tax is calculated after the discount on the net line amount:
-$$\text{Discounted Subtotal} = \text{Subtotal} - \text{Discount Amount}$$
-$$\text{Tax Amount} = \text{Round}\left(\frac{\text{Discounted Subtotal} \times \text{Tax Rate}}{100}\right)$$
+
+```
+Discounted Subtotal = Subtotal - Discount Amount
+```
+
+```
+Tax Amount = Round((Discounted Subtotal x Tax Percent) / 100)
+```
 
 #### (iv) Line Total:
 
-$$\text{Line Total} = \text{Discounted Subtotal} + \text{Tax Amount}$$
+```
+Line Total = Discounted Subtotal + Tax Amount
+```
 
 #### (v) Rounding Standard:
 
@@ -87,7 +106,7 @@ Below is the test case executed by our test suite (`tests/unit/pricing_calculato
 ### Prerequisites
 
 - **Node.js:** `^20.x` or higher
-- **PostgreSQL**: `^15.x` running locally or via Docker
+- **PostgreSQL**: `^15.x` running locally
 - **Package Manager:** `npm`
 
 ### Step-by-Step Installation
@@ -144,13 +163,54 @@ To generate `APP_KEY`, run this command and copy the generated key (e.g. `erM2q2
 node ace generate:key --show
 ```
 
-**4. Run Database Migrations:**
+**4. Create the Database:**
+
+Ensure PostgreSQL is running locally, then create the database specified in your `.env` file (e.g. `multi_rate_pricing_calculator`):
+
+- Linux (Ubuntu/Debian):
+
+```bash
+sudo -u postgres createdb multi_rate_pricing_calculator
+```
+
+- macOS (Homebrew):
+
+```bash
+createdb multi_rate_pricing_calculator
+```
+
+- Windows:
+
+```
+createdb -U postgres multi_rate_pricing_calculator
+```
+
+- Via PostgreSQL Interactive Shell (psql):
+
+Connect to `psql`:
+
+```bash
+# Linux:
+sudo -u postgres psql
+
+# macOS / Windows:
+psql -U postgres
+```
+
+Then execute inside the shell:
+
+```sql
+CREATE DATABASE multi_rate_pricing_calculator;
+\q
+```
+
+**5. Run Database Migrations:**
 
 ```bash
 node ace migration:run
 ```
 
-**5. Run the Application:**
+**6. Run the Application:**
 
 ```bash
 npm run dev
@@ -226,6 +286,12 @@ node ace test unit
 
 - _Tradeoff:_ Simplifies route management and controller logic for a server-rendered application, though dedicated public client API consumption in the future would benefit from strict URI version segregation.
 
+**5. Currency Formatting & Localization Assumptions:**
+
+- _**Decision:**_ The calculation engine operates strictly on abstract minor integer units (e.g. cents/kobo). Lucid ORM hooks handle conversions to major units for storage and minor units during serialization. The HTML views default to USD formatting (`$`).
+
+- _**Tradeoff:**_ Documents are currently bound to a single hardcoded currency symbol (`$`) rather than supporting dynamic per-document ISO currency codes (e.g., `USD`, `EUR`, `NGN`).
+
 ## What I Would Improve Before Production
 
 **1. Infrastructure & VPS Deployment (Docker & Containerization):**
@@ -237,16 +303,18 @@ node ace test unit
 
 - While unit tests cover the calculation service exhaustively, adding integration test cases for all the API endpoints will ensure that the expected response structure is always returned. Adding browser tests with Playwright for full UI flows e.g. (sign up $\rightarrow$ document list $\rightarrow$ document creation $\rightarrow$ adding line items $\rightarrow$ finalization immutability check) would prevent regression bugs on view interactions.
 
-**3. Asynchronous Export Generation:**
+**3. Multi-Currency & ISO Code Support:**
 
-- Implement asynchronous background worker (e.g., BullMQ) for generating downloadable PDF invoices sent via email or direct download links.
+- Bind each document to an explicit ISO currency code (`USD`, `EUR`, `NGN`) and record a frozen exchange rate against the account's base currency upon finalization. This enables multi-currency invoicing while allowing account-level summary reports to aggregate with a single base currency.
 
-**4. Comprehensive Documentation:**
+**4. Asynchronous Export Generation:**
+
+- Implement asynchronous background worker (e.g. BullMQ) for generating downloadable PDF invoices sent via email or direct download links.
+
+**5. Structured Logging & Application Observability:**
+
+- Integrate structured logging to track error stacks, database query latency, and audit logs for financial document state changes.
+
+**6. Comprehensive Documentation:**
 
 - Detailed documentation of all API routes, including schema definitions for request payloads and structured success/error response bodies (`201 Created`, `200 OK`, `400 Bad Request`, `422 Unprocessable Entity`).
-
-**5. Dedicated Frontend Styling & Asset Pipeline**
-
-- Extract layout styles from inline HTML attributes into organized external CSS components to improve template readability and maintainability.
-- Redesign the default AdonisJS starter homepage to align with the application’s design system and document dashboard UI, providing a cohesive brand experience across all public and authenticated views.
-- Extract repeating layout blocks (e.g., summary metrics cards, status badges, flash message banners) into dedicated Edge UI components to reduce template duplication and streamline future feature updates.
