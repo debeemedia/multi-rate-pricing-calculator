@@ -3,6 +3,15 @@ import vine from '@vinejs/vine'
 import { DateTime } from 'luxon'
 
 /**
+ * Custom rule: Strips HTML tags from string fields
+ */
+const stripTags = vine.createRule((value, _options, field) => {
+  if (typeof value === 'string') {
+    field.value = value.replace(/<[^>]*>?/gm, '')
+  }
+})
+
+/**
  * Custom rule: Enforces at most 2 decimal places (e.g. 10.50 is valid, 10.555 is invalid)
  */
 const maxTwoDecimals = vine.createRule((value, _, field) => {
@@ -31,7 +40,7 @@ const isInteger = vine.createRule((value, _options, field) => {
 
 // Document line item schema
 export const documentLineItemSchema = vine.object({
-  description: vine.string().trim().minLength(1).maxLength(100),
+  description: vine.string().trim().use(stripTags()).minLength(1).maxLength(100),
   quantity: vine.number().min(1).use(isInteger()),
   unitPrice: vine.number().min(0).use(maxTwoDecimals()),
   discountType: vine.enum(discountTypes).optional(),
@@ -124,8 +133,8 @@ export const documentLineItemSchema = vine.object({
 })
 
 // Fields for document schema
-const titleSchema = vine.string().trim().minLength(1).maxLength(50)
-const customerNameSchema = vine.string().trim().minLength(1).maxLength(50)
+const titleSchema = vine.string().trim().use(stripTags()).minLength(1).maxLength(50)
+const customerNameSchema = vine.string().trim().use(stripTags()).minLength(1).maxLength(50)
 const issueDateSchema = vine
   .string()
   .transform((value) => DateTime.fromISO(value, { zone: 'utc' }).startOf('day'))
