@@ -7,10 +7,9 @@ import { DateTime } from 'luxon'
  */
 const stripTags = vine.createRule((value, _options, field) => {
   if (typeof value === 'string') {
-    const cleanValue = value.replace(/<[^>]*>?/gm, '')
-    field.mutate(cleanValue, field.meta)
+    field.value = value.replace(/<[^>]*>?/gm, '')
   }
-}, { isAsync: false })
+})
 
 /**
  * Custom rule: Enforces at most 2 decimal places (e.g. 10.50 is valid, 10.555 is invalid)
