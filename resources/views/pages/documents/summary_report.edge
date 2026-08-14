@@ -4,10 +4,9 @@
     <div class="report-header-row mb-4">
       <div>
         <a href="{{ route('documents.index') }}" class="back-link">← Back to Documents List</a>
-        <h1 class="page-title mt-2">Document Summary Report</h1>
+        <h1 class="page-title mt-4">Document Summary Report</h1>
       </div>
     </div>
-
     {{-- Error Banner --}}
     @assign(activeError = errorMessage || flashMessages.get('error'))
     @if(activeError)
@@ -18,7 +17,6 @@
         </a>
       </div>
     @end
-
     {{-- Filter Form Block --}}
     <div class="card-block mb-4">
       <form action="{{ route('documents.summary_report') }}" method="GET">
@@ -51,7 +49,6 @@
         </div>
       </form>
     </div>
-
     {{-- Active Date Scope Pill --}}
     <div class="report-context-bar">
       <span class="context-pill">
@@ -77,24 +74,11 @@
         </strong>
       </span>
     </div>
-
-    {{-- Calculation Policy Callout Box --}}
-    <div class="policy-callout">
-      <strong>Calculation Policy:</strong> Total Subtotal represents gross line amounts before deductions or taxes. Discounts are deducted first to derive the net taxable amount, after which tax is calculated and added to form the Sum of Grand Totals (final payable total).
-    </div>
-
     {{-- Aggregated Metrics Cards --}}
     <div class="metrics-grid">
       <div class="metric-card">
         <span class="metric-label">Total Finalized Documents</span>
         <span class="metric-value font-mono">{{ report.totalDocuments || 0 }}</span>
-      </div>
-
-      <div class="metric-card">
-        <span class="metric-label">Total Subtotal</span>
-        <span class="metric-value font-mono">
-          ${{ Number(report.aggregateSubtotal || 0).toFixed(2) }}
-        </span>
       </div>
 
       <div class="metric-card">

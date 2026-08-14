@@ -156,7 +156,16 @@
               <span class="font-mono">+${{ Number(document.totalTax).toFixed(2) }}</span>
             </div>
             <div class="totals-row grand">
-              <span>Grand Total</span>
+              <span class="tooltip-wrapper">
+                Grand Total
+                <button type="button" class="info-tooltip-icon" aria-label="Calculation Policy">
+                  ⓘ
+                  <span class="tooltip-content">
+                    <strong>Calculation Policy:</strong>
+                    Subtotal represents gross line amounts (Quantity × Price) before deductions or taxes. Discounts are deducted first to derive the net taxable amount, after which tax is calculated and added to form the line total. The sum of line totals is the Grand Total.
+                  </span>
+                </button>
+              </span>
               <span class="font-mono">${{ Number(document.grandTotal).toFixed(2) }}</span>
             </div>
           </div>
