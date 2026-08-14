@@ -4,24 +4,37 @@
     <p>
       Create accurate invoices, quotes, and bills with line-item discounts, custom tax rates, and zero rounding errors.
     </p>
+    {{-- Main Action Button --}}
+    <div style="margin-top: 1.5rem;">
+      <a href="{{ route('documents.index') }}" class="button">Go to Documents →</a>
+    </div>
   </div>
 
   <div class="cards">
-    <div class="card">
-      <h3>Exact Math Engine &nbsp;›</h3>
-      <p>
-        Integer-based pricing engine powered by integer cents eliminates floating-point rounding bugs.
-      </p>
-    </div>
-    <div class="card">
-      <h3>Multi-Rate Discounts & Tax &nbsp;›</h3>
-      <p>
-        Apply fixed amounts or percentage discounts per line item with precise subtotal breakdowns.
-      </p>
-    </div>
-    <div class="card">
-      <h3>Immutable Finalization &nbsp;›</h3>
-      <p>Lock finalized documents against accidental edits while keeping full audit history.</p>
-    </div>
+    {{-- Card 1: Clickable link to Documents --}}
+    <a href="{{ route('documents.index') }}" class="card-link">
+      <div class="card">
+        <h3>Exact Math Engine &nbsp;›</h3>
+        <p>
+          Integer-based pricing engine powered by integer cents eliminates floating-point rounding bugs.
+        </p>
+      </div>
+    </a>
+    {{-- Card 2: Clickable link to Documents --}}
+    <a href="{{ route('documents.index') }}" class="card-link">
+      <div class="card">
+        <h3>Multi-Rate Discounts & Tax &nbsp;›</h3>
+        <p>
+          Apply fixed amounts or percentage discounts per line item with precise subtotal breakdowns.
+        </p>
+      </div>
+    </a>
+    {{-- Card 3: Clickable link to Documents --}}
+    <a href="{{ route('documents.index') }}" class="card-link">
+      <div class="card">
+        <h3>Immutable Finalization &nbsp;›</h3>
+        <p>Lock finalized documents against accidental edits while keeping full audit history.</p>
+      </div>
+    </a>
   </div>
 @end

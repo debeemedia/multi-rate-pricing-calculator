@@ -1,112 +1,61 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Your Documents</title>
-    <style>
-      body {
-        font-family:
-          system-ui,
-          -apple-system,
-          sans-serif;
-        max-width: 800px;
-        margin: 40px auto;
-        padding: 0 20px;
-      }
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 1rem;
-      }
-      th,
-      td {
-        border: 1px solid #e5e7eb;
-        padding: 10px;
-        text-align: left;
-      }
-      th {
-        background: #f9fafb;
-      }
-      .btn {
-        display: inline-block;
-        background: #2563eb;
-        color: white;
-        padding: 8px 14px;
-        text-decoration: none;
-        border-radius: 4px;
-      }
-      .btn-secondary {
-        background: white;
-        color: #374151;
-        border: 1px solid #d1d5db;
-        padding: 8px 14px;
-        border-radius: 4px;
-        font-weight: 600;
-        text-decoration: none;
-        display: inline-block;
-        transition: all 0.15s ease;
-      }
-
-      .btn-secondary:hover {
-        background: #f3f4f6;
-        border-color: #9ca3af;
-      }
-      .badge {
-        padding: 2px 8px;
-        border-radius: 9999px;
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        font-weight: bold;
-      }
-      .draft {
-        background: #fef3c7;
-        color: #92400e;
-      }
-      .finalized {
-        background: #d1fae5;
-        color: #065f46;
-      }
-    </style>
-  </head>
-  <body>
-    <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem;">
-      <h1>Documents</h1>
-      <div style="display: flex; gap: 0.75rem; align-items: center;">
-        <a href="{{ route('documents.summary_report') }}" class="btn-secondary">
+@layout()
+  <div class="documents-container">
+    <div class="page-header">
+      <div>
+        <h1>Documents</h1>
+        <p class="subtitle">
+          Manage draft and finalized documents, tracking totals with zero rounding errors.
+        </p>
+      </div>
+      <div class="header-actions">
+        <a href="{{ route('documents.summary_report') }}" class="button secondary">
           View Summary Report
         </a>
-        <a href="{{ route('documents.create') }}" class="btn">+ Create New Document</a>
+        <a href="{{ route('documents.create') }}" class="button">+ Create New Document</a>
       </div>
     </div>
-    @if(flashMessages.has('success'))
-      <p style="color: green;">{{ flashMessages.get('success') }}</p>
-    @end
     @if(!documents.length)
-      <p>No documents found. Click create to start!</p>
+      <div class="empty-state">
+        <p>No documents found.</p>
+        <a href="{{ route('documents.create') }}" class="button">Create your first document</a>
+      </div>
     @else
-      <table>
-        <thead>
-          <tr>
-            <th>Title</th>
-            <th>Customer</th>
-            <th>Status</th>
-            <th>Grand Total</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          @each(doc in documents)
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead>
             <tr>
-              <td>{{ doc.title }}</td>
-              <td>{{ doc.customerName }}</td>
-              <td><span class="badge {{ doc.status }}">{{ doc.status }}</span></td>
-              <td>${{ Number(doc.grandTotal).toFixed(2) }}</td>
-              <td><a href="{{ route('documents.show', { id: doc.id }) }}">View</a></td>
+              <th>Title</th>
+              <th>Customer</th>
+              <th>Status</th>
+              <th>Issue Date ↓</th>
+              <th class="text-right">Grand Total</th>
+              <th class="text-center">Action</th>
             </tr>
-          @end
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            @each(doc in documents)
+              <tr>
+                <td class="font-medium">{{ doc.title }}</td>
+                <td>{{ doc.customerName }}</td>
+                <td>
+                  <span
+                    class="badge {{ doc.status === 'finalized' ? 'badge-success' : 'badge-draft' }}"
+                  >
+                    {{ doc.status }}
+                  </span>
+                </td>
+                <td class="font-mono text-muted">
+                  {{ doc.issueDate ? doc.issueDate.toFormat('yyyy-MM-dd') : '—' }}
+                </td>
+                <td class="text-right font-mono">${{ Number(doc.grandTotal).toFixed(2) }}</td>
+                <td class="text-center">
+                  <a href="{{ route('documents.show', { id: doc.id }) }}">View</a>
+                </td>
+              </tr>
+            @end
+          </tbody>
+        </table>
+      </div>
     @end
-  </body>
-</html>
+  </div>
+@end

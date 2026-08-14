@@ -1,122 +1,29 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Summary Report - Pricing Calculator</title>
-    <style>
-      body {
-        font-family:
-          system-ui,
-          -apple-system,
-          sans-serif;
-        max-width: 900px;
-        margin: 40px auto;
-        padding: 0 20px;
-        line-height: 1.5;
-      }
-      .filter-card {
-        background: #f9fafb;
-        border: 1px solid #e5e7eb;
-        padding: 1.25rem;
-        border-radius: 6px;
-        margin-bottom: 2rem;
-      }
-      .filter-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) auto;
-        gap: 12px;
-        align-items: end;
-      }
-      label {
-        display: block;
-        font-size: 0.85rem;
-        font-weight: 600;
-        margin-bottom: 4px;
-      }
-      input,
-      select {
-        width: 100%;
-        padding: 8px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        box-sizing: border-box;
-      }
-      .metrics-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem;
-        margin-bottom: 2rem;
-      }
-      .metric-card {
-        background: #f3f4f6;
-        padding: 1rem;
-        border-radius: 6px;
-        border-left: 4px solid #2563eb;
-      }
-      .metric-card .value {
-        font-size: 1.5rem;
-        font-weight: bold;
-        color: #1e3a8a;
-      }
-      button {
-        background: #2563eb;
-        color: white;
-        padding: 8px 16px;
-        border: none;
-        border-radius: 4px;
-        font-weight: 600;
-        cursor: pointer;
-      }
-      .btn-reset {
-        background: #6b7280;
-        text-decoration: none;
-        color: white;
-        padding: 8px 14px;
-        border-radius: 4px;
-        font-size: 0.9rem;
-        display: inline-block;
-      }
-      .btn-back {
-        color: #2563eb;
-        text-decoration: none;
-        font-weight: 600;
-      }
-      .btn-back:hover {
-        text-decoration: underline;
-      }
-    </style>
-  </head>
-  <body>
-    {{-- 1. DEFINE ACTIVE ERROR FOR BOTH DIRECT RENDER AND FLASH STORE --}}
+@layout()
+  <div class="report-container">
+    {{-- Header & Navigation --}}
+    <div class="report-header-row mb-4">
+      <div>
+        <a href="{{ route('documents.index') }}" class="back-link">← Back to Documents List</a>
+        <h1 class="page-title mt-2">Document Summary Report</h1>
+      </div>
+    </div>
+    {{-- Error Banner --}}
+    {{-- Ensure to flash the error here since we did not flash in the controller; we used the errorMessage variable. --}}
     @assign(activeError = errorMessage || flashMessages.get('error'))
-    {{-- FLASH / ERROR MESSAGE BANNER --}}
     @if(activeError)
-      <div
-        style="background: #fef2f2; border: 1px solid #fca5a5; color: #991b1b; padding: 12px; border-radius: 6px; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;"
-      >
+      <div class="alert alert-destructive mb-4">
         <span>{{ activeError }}</span>
-        <a
-          href="{{ route('documents.summary_report') }}"
-          style="color: #991b1b; font-weight: bold; font-size: 0.85rem; text-decoration: underline;"
-        >
+        <a href="{{ route('documents.summary_report') }}" class="alert-action-link">
           Clear Filters
         </a>
       </div>
     @end
-
-    <div
-      style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;"
-    >
-      <h1 style="margin: 0;">Document Summary Report</h1>
-      <a href="{{ route('documents.index') }}" class="btn-back">← Back to Documents</a>
-    </div>
-    {{-- Filter Form --}}
-    <div class="filter-card">
+    {{-- Filter Form Block --}}
+    <div class="card-block mb-4">
       <form action="{{ route('documents.summary_report') }}" method="GET">
-        <div class="filter-grid">
-          <div>
-            <label for="startDate">From Date</label>
+        <div class="report-filter-grid">
+          <div class="form-field">
+            <label for="startDate">Issue Date From</label>
             <input
               type="date"
               id="startDate"
@@ -125,49 +32,76 @@
             />
           </div>
 
-          <div>
-            <label for="endDate">To Date</label>
-            {{-- 2. USE activeError HERE SO THE INPUT TURNS RED ON FIRST CLICK --}}
+          <div class="form-field">
+            <label for="endDate">Issue Date To</label>
             <input
               type="date"
               id="endDate"
               name="endDate"
               value="{{ filters.endDate || '' }}"
-              style="{{
-                activeError
-                  ? 'border-color: #ef4444; background-color: #fef2f2;'
-                  : ''
-              }}"
+              class="{{ activeError ? 'input-error' : '' }}"
             />
           </div>
 
-          <div style="display: flex; gap: 8px;">
-            <button type="submit">Filter</button>
-            <a href="{{ route('documents.summary_report') }}" class="btn-reset">Reset</a>
+          <div class="filter-actions">
+            <button type="submit" class="button">Apply Filter</button>
+            <a href="{{ route('documents.summary_report') }}" class="button secondary">Reset</a>
           </div>
         </div>
       </form>
     </div>
+    {{-- Active Date Scope Context Note --}}
+    <div class="report-context-bar mb-3">
+      <span class="context-pill">
+        Showing metrics for
+        <strong>finalized</strong>
+        documents with
+        <strong>issue date</strong>
+        between:
+        <strong>
+          @if(filters.startDate && filters.endDate)
+            {{ filters.startDate }}
+            and
+            {{ filters.endDate }}
+          @elseif(filters.startDate)
+            {{ filters.startDate }}
+            onwards
+          @elseif(filters.endDate)
+            Up to
+            {{ filters.endDate }}
+          @else
+            All-Time (Default)
+          @end
+        </strong>
+      </span>
+    </div>
     {{-- Aggregated Metrics Cards --}}
     <div class="metrics-grid">
       <div class="metric-card">
-        <div>Total Finalized Documents</div>
-        <div class="value">{{ report.totalDocuments || 0 }}</div>
+        <span class="metric-label">Total Finalized Documents</span>
+        <span class="metric-value font-mono">{{ report.totalDocuments || 0 }}</span>
       </div>
-      <div class="metric-card">
-        <div>Total Revenue</div>
-        <div class="value">${{ Number(report.aggregateGrandTotal || 0).toFixed(2) }}</div>
+
+      <div class="metric-card highlight">
+        <span class="metric-label">Total Revenue</span>
+        <span class="metric-value font-mono">
+          ${{ Number(report.aggregateGrandTotal || 0).toFixed(2) }}
+        </span>
       </div>
+
       <div class="metric-card">
-        <div>Total Discounts</div>
-        <div class="value">
+        <span class="metric-label">Total Discounts</span>
+        <span class="metric-value font-mono">
           -${{ Number(report.aggregateTotalDiscount || 0).toFixed(2) }}
-        </div>
+        </span>
       </div>
+
       <div class="metric-card">
-        <div>Total Tax Collected</div>
-        <div class="value">${{ Number(report.aggregateTotalTax || 0).toFixed(2) }}</div>
+        <span class="metric-label">Total Tax Collected</span>
+        <span class="metric-value font-mono">
+          ${{ Number(report.aggregateTotalTax || 0).toFixed(2) }}
+        </span>
       </div>
     </div>
-  </body>
-</html>
+  </div>
+@end

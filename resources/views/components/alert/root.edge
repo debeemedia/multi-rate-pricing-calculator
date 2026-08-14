@@ -1,5 +1,6 @@
 @let(variant = $props.get('variant') || 'default')
-@inject({ variant, autoDismiss: $props.get('autoDismiss') })
+@let(autoDismiss = $props.get('autoDismiss') ?? false)
+@inject({ variant, autoDismiss })
 @let(classes = ['alert', `alert-${variant}`])
 
 <div {{
@@ -8,7 +9,7 @@
     .merge({
       role: 'alert',
       class: classes,
-      'x-data': 'alert',
+      'x-data': `alert({ autoDismiss: ${autoDismiss ? 'true' : 'false'} })`,
       'x-show': 'isVisible',
       'x-cloak': true,
     })

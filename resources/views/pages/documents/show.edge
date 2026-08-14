@@ -1,297 +1,171 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{{ document.title }} - Pricing Calculator</title>
-    <style>
-      body {
-        font-family:
-          system-ui,
-          -apple-system,
-          sans-serif;
-        max-width: 800px;
-        margin: 40px auto;
-        padding: 0 20px;
-        line-height: 1.5;
-      }
-      .header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-bottom: 2px solid #e5e7eb;
-        padding-bottom: 1rem;
-        margin-bottom: 1.5rem;
-      }
-      .badge {
-        padding: 4px 10px;
-        border-radius: 9999px;
-        font-size: 0.8rem;
-        text-transform: uppercase;
-        font-weight: bold;
-      }
-      .draft {
-        background: #fef3c7;
-        color: #92400e;
-      }
-      .finalized {
-        background: #d1fae5;
-        color: #065f46;
-      }
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 1.5rem 0;
-      }
-      th,
-      td {
-        border: 1px solid #e5e7eb;
-        padding: 10px;
-        text-align: left;
-      }
-      th {
-        background: #f9fafb;
-      }
-      .totals-box {
-        margin-left: auto;
-        width: 300px;
-        background: #f9fafb;
-        padding: 1rem;
-        border-radius: 6px;
-        border: 1px solid #e5e7eb;
-      }
-      .totals-row {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 0.5rem;
-      }
-      .totals-row.grand {
-        font-weight: bold;
-        font-size: 1.2rem;
-        border-top: 2px solid #374151;
-        padding-top: 0.5rem;
-        margin-top: 0.5rem;
-      }
-      .card {
-        background: #f3f4f6;
-        padding: 1.5rem;
-        border-radius: 6px;
-        margin-top: 2rem;
-      }
-      .form-grid {
-        display: grid;
-        grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr;
-        gap: 8px;
-      }
-      input,
-      select {
-        padding: 8px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        width: 100%;
-        box-sizing: border-box;
-      }
-      button {
-        background: #2563eb;
-        color: white;
-        padding: 8px 14px;
-        border: none;
-        border-radius: 4px;
-        font-weight: 600;
-        cursor: pointer;
-      }
-      button.btn-finalize {
-        background: #059669;
-      }
-      button.btn-danger {
-        background: #dc2626;
-      }
-      .btn-delete-item {
-        color: #dc2626;
-        background: none;
-        border: none;
-        padding: 0;
-        cursor: pointer;
-        font-weight: bold;
-      }
-      .btn-delete-item:hover {
-        text-decoration: underline;
-      }
-      .flash-success {
-        background: #ecfdf5;
-        border: 1px solid #a7f3d0;
-        color: #065f46;
-        padding: 10px;
-        border-radius: 4px;
-        margin-bottom: 1rem;
-      }
-      .flash-error {
-        background: #fef2f2;
-        border: 1px solid #fca5a5;
-        color: #991b1b;
-        padding: 10px;
-        border-radius: 4px;
-        margin-bottom: 1rem;
-      }
-    </style>
-  </head>
-  <body>
-    @if(flashMessages.has('success'))
-      <div class="flash-success">{{ flashMessages.get('success') }}</div>
-    @end
-    {{-- Domain / Exception errors --}}
-    @if(flashMessages.has('error'))
-      <div class="flash-error">{{ flashMessages.get('error') }}</div>
-    @end
-    {{-- Validdation errors --}}
-    @if(flashMessages.has('inputErrorsBag'))
-      <div class="flash-error">
-        <ul>
-          @each((messages, field) in flashMessages.get('inputErrorsBag'))
-            @each(message in messages)
-              <li>{{ field }}: {{ message }}</li>
-            @end
-          @end
-        </ul>
-      </div>
-    @end
-
-    <div class="header">
-      <div>
-        <h1>{{ document.title }}</h1>
-        <p style="color: #6b7280; margin: 0;">
-          Customer:
-          <strong>{{ document.customerName }}</strong>
-          | Issue Date:
-          {{ document.issueDate.toISODate() }}
-        </p>
-        {{-- Update draft document --}}
-        @if(document.status === 'draft')
-          <details style="margin-top: 1rem;">
-            <summary style="cursor: pointer; color: #2563eb; font-weight: 600; font-size: 0.9rem;">
-              Edit Details
-            </summary>
-            <form
-              action="{{ route('documents.update', { id: document.id }) }}?_method=PUT"
-              method="POST"
-              style="margin-top: 0.5rem; display: flex; gap: 8px; flex-wrap: wrap;"
+@layout()
+  <div class="document-detail-container">
+    {{-- Breadcrumb Navigation --}}
+    <div class="mb-4">
+      <a href="{{ route('documents.index') }}" class="back-link">← Back to Documents List</a>
+    </div>
+    {{-- Document Header --}}
+    <div class="document-header-card">
+      <div class="header-main">
+        <div>
+          <div class="header-title-row">
+            <h1>{{ document.title }}</h1>
+            <span
+              class="badge {{ document.status === 'finalized' ? 'badge-success' : 'badge-draft' }}"
             >
-              {{ csrfField() }}
+              {{ document.status }}
+            </span>
+          </div>
+          <p class="subtitle">
+            Customer:
+            <strong>{{ document.customerName }}</strong>
+            <span class="divider">•</span>
+            Issue Date:
+            <strong>{{ document.issueDate.toISODate() }}</strong>
+          </p>
+        </div>
+      </div>
+      {{-- Editable Details Accordion for Drafts --}}
+      @if(document.status === 'draft')
+        <details class="edit-details-toggle">
+          <summary>Edit Basic Details</summary>
+          <form
+            action="{{ route('documents.update', { id: document.id }) }}?_method=PUT"
+            method="POST"
+            class="edit-details-form"
+          >
+            {{ csrfField() }}
+            <div class="inline-field">
+              <label for="edit-title">Title</label>
               <input
                 type="text"
+                id="edit-title"
                 name="title"
                 value="{{ old('title') || document.title }}"
                 placeholder="Title"
                 required
-                style="flex: 2; min-width: 150px;"
               />
+            </div>
+            <div class="inline-field">
+              <label for="edit-customer">Customer</label>
               <input
                 type="text"
+                id="edit-customer"
                 name="customerName"
                 value="{{ old('customerName') || document.customerName }}"
-                placeholder="Customer"
+                placeholder="Customer Name"
                 required
-                style="flex: 2; min-width: 150px;"
               />
+            </div>
+            <div class="inline-field">
+              <label for="edit-date">Issue Date</label>
               <input
                 type="date"
+                id="edit-date"
                 name="issueDate"
                 value="{{ old('issueDate') || document.issueDate.toISODate() }}"
                 required
-                style="flex: 1; min-width: 130px;"
               />
-              <button type="submit">Save</button>
-            </form>
-          </details>
-        @end
-      </div>
-      <div><span class="badge {{ document.status }}">{{ document.status }}</span></div>
+            </div>
+            <button type="submit" class="button secondary">Save Details</button>
+          </form>
+        </details>
+      @end
     </div>
-
-    <h2>Line Items</h2>
-    @if(document.documentLineItems.length === 0)
-      <p style="color: #6b7280; font-style: italic;">No line items added yet.</p>
-    @else
-      <table>
-        <thead>
-          <tr>
-            <th>Description</th>
-            <th>Qty</th>
-            <th>Unit Price</th>
-            <th>Discount</th>
-            <th>Tax %</th>
-            <th>Subtotal</th>
-            <th>Line Total</th>
-            {{-- 1. ADD ACTION COLUMN HEADER IF DRAFT --}}
-            @if(document.status === 'draft')
-              <th>Action</th>
-            @end
-          </tr>
-        </thead>
-        <tbody>
-          @each(item in document.documentLineItems)
-            <tr>
-              <td>{{ item.description }}</td>
-              <td>{{ item.quantity }}</td>
-              <td>${{ Number(item.unitPrice).toFixed(2) }}</td>
-              <td>
-                @if(item.discountType === 'percent')
-                  {{ item.discountValue }}
-                  %
-                @elseif(item.discountType === 'fixed')
-                  $
-                  {{ Number(item.discountValue).toFixed(2) }}
-                @else
-                  None
+    {{-- Line Items Table --}}
+    <div class="section-block">
+      <h2>Line Items</h2>
+      @if(document.documentLineItems.length === 0)
+        <div class="empty-state">
+          <p>No line items added yet.</p>
+        </div>
+      @else
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Description</th>
+                <th class="text-center">Qty</th>
+                <th class="text-right">Unit Price</th>
+                <th class="text-right">Discount</th>
+                <th class="text-right">Tax %</th>
+                <th class="text-right">Subtotal</th>
+                <th class="text-right">Line Total</th>
+                @if(document.status === 'draft')
+                  <th class="text-center">Action</th>
                 @end
-              </td>
-              <td>{{ item.taxPercent }}%</td>
-              <td>${{ Number(item.subtotal).toFixed(2) }}</td>
-              <td><strong>${{ Number(item.lineTotal).toFixed(2) }}</strong></td>
-              {{-- 2. ADD DELETE FORM COLUMN IF DRAFT --}}
-              @if(document.status === 'draft')
-                <td>
-                  <form
-                    action="{{
-                      route('documents.document_line_items.destroy', {
-                        document_id: document.id,
-                        id: item.id,
-                      })
-                    }}?_method=DELETE"
-                    method="POST"
-                    onsubmit="return confirm('Remove this line item?');"
-                  >
-                    {{ csrfField() }}
-                    <button type="submit" class="btn-delete-item">Delete</button>
-                  </form>
-                </td>
+              </tr>
+            </thead>
+            <tbody>
+              @each(item in document.documentLineItems)
+                <tr>
+                  <td class="font-medium">{{ item.description }}</td>
+                  <td class="text-center font-mono">{{ item.quantity }}</td>
+                  <td class="text-right font-mono">${{ Number(item.unitPrice).toFixed(2) }}</td>
+                  <td class="text-right font-mono">
+                    @if(item.discountType === 'percent')
+                      {{ item.discountValue }}
+                      %
+                    @elseif(item.discountType === 'fixed')
+                      $
+                      {{ Number(item.discountValue).toFixed(2) }}
+                    @else
+                      None
+                    @end
+                  </td>
+                  <td class="text-right font-mono">{{ item.taxPercent }}%</td>
+                  <td class="text-right font-mono">${{ Number(item.subtotal).toFixed(2) }}</td>
+                  <td class="text-right font-mono font-medium">
+                    ${{ Number(item.lineTotal).toFixed(2) }}
+                  </td>
+                  @if(document.status === 'draft')
+                    <td class="text-center">
+                      <form
+                        action="{{
+                          route('documents.document_line_items.destroy', {
+                            document_id: document.id,
+                            id: item.id,
+                          })
+                        }}?_method=DELETE"
+                        method="POST"
+                        onsubmit="return confirm('Remove this line item?');"
+                      >
+                        {{ csrfField() }}
+                        <button type="submit" class="btn-delete-item">Delete</button>
+                      </form>
+                    </td>
+                  @end
+                </tr>
               @end
-            </tr>
-          @end
-        </tbody>
-      </table>
-
-      <div class="totals-box">
-        <div class="totals-row">
-          <span>Subtotal:</span>
-          <span>${{ Number(document.subtotal).toFixed(2) }}</span>
+            </tbody>
+          </table>
         </div>
-        <div class="totals-row">
-          <span>Total Discount:</span>
-          <span>-${{ Number(document.totalDiscount).toFixed(2) }}</span>
+        {{-- Totals Summary Box --}}
+        <div class="totals-summary-container">
+          <div class="totals-box">
+            <div class="totals-row">
+              <span>Subtotal</span>
+              <span class="font-mono">${{ Number(document.subtotal).toFixed(2) }}</span>
+            </div>
+            <div class="totals-row">
+              <span>Total Discount</span>
+              <span class="font-mono">-${{ Number(document.totalDiscount).toFixed(2) }}</span>
+            </div>
+            <div class="totals-row">
+              <span>Total Tax</span>
+              <span class="font-mono">+${{ Number(document.totalTax).toFixed(2) }}</span>
+            </div>
+            <div class="totals-row grand">
+              <span>Grand Total</span>
+              <span class="font-mono">${{ Number(document.grandTotal).toFixed(2) }}</span>
+            </div>
+          </div>
         </div>
-        <div class="totals-row">
-          <span>Total Tax:</span>
-          <span>+${{ Number(document.totalTax).toFixed(2) }}</span>
-        </div>
-        <div class="totals-row grand">
-          <span>Grand Total:</span>
-          <span>${{ Number(document.grandTotal).toFixed(2) }}</span>
-        </div>
-      </div>
-    @end
+      @end
+    </div>
+    {{-- Add Line Item Form (Draft Only) --}}
     @if(document.status === 'draft')
-      <div class="card">
+      <div class="card-form-block">
         <h3>Add Line Item</h3>
         <form
           action="{{
@@ -302,121 +176,125 @@
           method="POST"
         >
           {{ csrfField() }}
-          <div class="form-grid">
-            <div>
-              <label style="font-size: 0.8rem; font-weight: 600; display: block; margin-bottom: 4px;">Description</label>
-              <input 
-                type="text" 
-                name="description" 
-                placeholder="e.g. Web Development" 
-                value="{{ old('description') || '' }}" 
-                required 
+          <div class="line-item-grid">
+            <div class="grid-field span-2">
+              <label for="item-description">Description</label>
+              <input
+                type="text"
+                id="item-description"
+                name="description"
+                placeholder="e.g. Web Development"
+                value="{{ old('description') || '' }}"
+                required
               />
             </div>
 
-            <div>
-              <label style="font-size: 0.8rem; font-weight: 600; display: block; margin-bottom: 4px;">Qty</label>
-              <input 
-                type="number" 
-                name="quantity" 
-                placeholder="Qty" 
-                min="1" 
-                value="{{ old('quantity') || '1' }}" 
-                required 
-              />
-            </div>
-
-            <div>
-              <label style="font-size: 0.8rem; font-weight: 600; display: block; margin-bottom: 4px;">Unit Price ($)</label>
+            <div class="grid-field">
+              <label for="item-qty">Qty</label>
               <input
                 type="number"
+                id="item-qty"
+                name="quantity"
+                placeholder="1"
+                min="1"
+                value="{{ old('quantity') || '1' }}"
+                required
+              />
+            </div>
+
+            <div class="grid-field">
+              <label for="item-unit-price">Unit Price ($)</label>
+              <input
+                type="number"
+                id="item-unit-price"
                 step="0.01"
                 name="unitPrice"
-                placeholder="Unit Price ($)"
+                placeholder="0.00"
                 value="{{ old('unitPrice') || '' }}"
                 required
               />
             </div>
 
-            <div>
-              <label style="font-size: 0.8rem; font-weight: 600; display: block; margin-bottom: 4px;">Discount Type</label>
-              <select name="discountType">
-                <option value="none" {{ old('discountType') === 'none' ? 'selected' : '' }}>No Discount</option>
-                <option value="fixed" {{ old('discountType') === 'fixed' ? 'selected' : '' }}>Fixed ($)</option>
-                <option value="percent" {{ old('discountType') === 'percent' ? 'selected' : '' }}>Percent (%)</option>
+            <div class="grid-field">
+              <label for="item-discount-type">Discount Type</label>
+              <select id="item-discount-type" name="discountType">
+                <option value="none" {{ old('discountType') === 'none' ? 'selected' : '' }}>
+                  No Discount
+                </option>
+                <option value="fixed" {{ old('discountType') === 'fixed' ? 'selected' : '' }}>
+                  Fixed ($)
+                </option>
+                <option value="percent" {{ old('discountType') === 'percent' ? 'selected' : '' }}>
+                  Percent (%)
+                </option>
               </select>
             </div>
 
-            <div>
-              <label style="font-size: 0.8rem; font-weight: 600; display: block; margin-bottom: 4px;">Discount Val</label>
+            <div class="grid-field">
+              <label for="item-discount-val">Discount Val</label>
               <input
                 type="number"
+                id="item-discount-val"
                 step="0.01"
                 name="discountValue"
-                placeholder="Disc Val"
+                placeholder="0.00"
                 value="{{ old('discountValue') || '0' }}"
               />
             </div>
 
-            <div>
-              <label style="font-size: 0.8rem; font-weight: 600; display: block; margin-bottom: 4px;">Tax %</label>
-              <input 
-                type="number" 
-                step="0.01" 
-                name="taxPercent" 
-                placeholder="Tax %" 
-                value="{{ old('taxPercent') || '0' }}" 
+            <div class="grid-field">
+              <label for="item-tax-percent">Tax %</label>
+              <input
+                type="number"
+                id="item-tax-percent"
+                step="0.01"
+                name="taxPercent"
+                placeholder="0.00"
+                value="{{ old('taxPercent') || '0' }}"
               />
             </div>
           </div>
 
-          <button type="submit" style="margin-top: 1rem;">+ Add Line Item</button>
+          <div class="mt-4"><button type="submit" class="button">+ Add Line Item</button></div>
         </form>
       </div>
-
-      <div style="margin-top: 2rem; display: flex; gap: 1rem; align-items: center;">
+      {{-- Action Bar --}}
+      <div class="document-actions-bar">
         @if(document.documentLineItems.length)
-          <!--Ready to finalize-->
           <form
             action="{{ route('documents.finalize', { id: document.id }) }}?_method=PATCH"
             method="POST"
             onsubmit="return confirm('Are you sure you want to finalize this document? Once finalized, line items and pricing can no longer be modified.');"
           >
             {{ csrfField() }}
-            <button type="submit" class="btn-finalize">Finalize Document (Freeze)</button>
+            <button type="submit" class="button success">Finalize Document (Freeze)</button>
           </form>
         @else
-          <!--Disabled state with helpful tip-->
-          <button
-            type="button"
-            class="btn btn-disabled"
-            disabled
-            title="Add at least one line item first"
-          >
-            Finalize Document
-          </button>
-          <small style="color: #666;">Add at least one line item to finalize.</small>
+          <div class="disabled-action-group">
+            <button type="button" class="button secondary" disabled>Finalize Document</button>
+            <span class="tip-text">Add at least one line item to finalize.</span>
+          </div>
         @end
 
         <form
           action="{{ route('documents.destroy', { id: document.id }) }}?_method=DELETE"
           method="POST"
-          style="margin-left: auto;"
+          class="ml-auto"
         >
           {{ csrfField() }}
-          <button type="submit" class="btn-danger" onclick="return confirm('Delete this draft?')">
+          <button
+            type="submit"
+            class="button destructive"
+            onclick="return confirm('Delete this draft?')"
+          >
             Delete Draft
           </button>
         </form>
       </div>
     @else
-      <p style="margin-top: 2rem; color: #059669; font-weight: bold;">
-        ✔ This document is finalized and read-only. No further modifications can be made.
-      </p>
+      <div class="read-only-banner">
+        <p>✔ This document is finalized and read-only. No further modifications can be made.</p>
+      </div>
     @end
-
-    <p style="margin-top: 2rem;">
-      <a href="{{ route('documents.index') }}">← Back to Documents List</a>
-    </p>
-  </body>
-</html>
+  </div>
+@end
