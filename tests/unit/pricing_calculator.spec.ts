@@ -1,6 +1,6 @@
 import { test } from '@japa/runner'
 import { CalculationError, PricingCalculator } from '#services/pricing_calculator_service'
-import { DiscountType, DiscountTypesEnum } from '#types/index'
+import { DiscountTypesEnum } from '#types/index'
 
 test.group('PricingCalculator', () => {
   test('should test the `calculateDocument` method and return the expected calculation results after discount and tax are applied', ({
@@ -12,7 +12,8 @@ test.group('PricingCalculator', () => {
         quantity: 2,
         unitPrice: 100.0,
         discountType: DiscountTypesEnum.Percent,
-        discountValue: 10,
+        discountValueFixed: null,
+        discountValuePercent: 10,
         taxPercent: 5,
       },
       {
@@ -20,7 +21,8 @@ test.group('PricingCalculator', () => {
         quantity: 1,
         unitPrice: 50.0,
         discountType: DiscountTypesEnum.None,
-        discountValue: 0,
+        discountValueFixed: null,
+        discountValuePercent: null,
         taxPercent: 5,
       },
       {
@@ -28,7 +30,8 @@ test.group('PricingCalculator', () => {
         quantity: 1,
         unitPrice: 200.0,
         discountType: DiscountTypesEnum.Fixed,
-        discountValue: 20,
+        discountValueFixed: 20,
+        discountValuePercent: null,
         taxPercent: 0,
       },
     ]
@@ -61,7 +64,7 @@ test.group('PricingCalculator', () => {
     assert.equal(result.totalDiscount, 40.0)
     assert.equal(result.totalTax, 11.5)
     assert.equal(result.grandTotal, 421.5)
-  })
+  }).tags(['pricing_calculator'])
 
   test('should test the `calculateDocument` method and return zero totals and an empty lineItems array when no line items are provided', ({
     assert,
@@ -85,13 +88,14 @@ test.group('PricingCalculator', () => {
       quantity: 1,
       unitPrice: 50,
       discountType: DiscountTypesEnum.Fixed,
-      discountValue: 100, // Exceeds 50 subtotal
+      discountValueFixed: 100, // Exceeds 50 subtotal
+      discountValuePercent: null,
       taxPercent: 0,
     }
     assert.throws(
       () => PricingCalculator.calculateLine(item),
       CalculationError,
-      `Fixed discount ($${item.discountValue.toFixed(2)}) cannot exceed line subtotal ($${(item.quantity * item.unitPrice).toFixed(2)}) for line: "${item.description}"`
+      `Fixed discount ($${item.discountValueFixed.toFixed(2)}) cannot exceed line subtotal ($${(item.quantity * item.unitPrice).toFixed(2)}) for line: "${item.description}"`
     )
   }).tags(['pricing_calculator'])
 
@@ -134,7 +138,8 @@ test.group('PricingCalculator', () => {
           quantity: 1,
           unitPrice: 50,
           discountType: DiscountTypesEnum.Percent,
-          discountValue: 100,
+          discountValueFixed: null,
+          discountValuePercent: 10,
           taxPercent: 200,
         }),
       CalculationError,
@@ -142,29 +147,10 @@ test.group('PricingCalculator', () => {
     )
   }).tags(['pricing_calculator'])
 
-  test('should test the `calculateLine` method and throw CalculationError when discount percentage value is invalid', ({
+  test('should test the `calculateLine` method and throw CalculationError when discount type is "none" but discount values are provided', ({
     assert,
   }) => {
-    const description = 'Invalid Discount Item'
-    assert.throws(
-      () =>
-        PricingCalculator.calculateLine({
-          description,
-          quantity: 1,
-          unitPrice: 50,
-          discountType: DiscountTypesEnum.Percent,
-          discountValue: 200,
-          taxPercent: 10,
-        }),
-      CalculationError,
-      `Discount percent must be between 0 and 100 for line: "${description}"`
-    )
-  }).tags(['pricing_calculator'])
-
-  test(`should test the "calculateLine" method and throw CalculationError when discount value is not 0 and discount type is: ${DiscountTypesEnum.None}`, ({
-    assert,
-  }) => {
-    const description = 'Invalid Discount Value'
+    const description = 'Invalid Discount Values For None'
     assert.throws(
       () =>
         PricingCalculator.calculateLine({
@@ -172,33 +158,107 @@ test.group('PricingCalculator', () => {
           quantity: 1,
           unitPrice: 50,
           discountType: DiscountTypesEnum.None,
-          discountValue: 200,
+          discountValueFixed: 10,
+          discountValuePercent: null,
           taxPercent: 10,
         }),
       CalculationError,
-      `Discount value must be zero when discount type is "${DiscountTypesEnum.None}" for line: "${description}"`
+      `Both discount fields must be null when discount type is "none" for line: "${description}"`
     )
   }).tags(['pricing_calculator'])
 
-  test(
-    'should test the `calculateLine` method and throw CalculationError when discount value is 0 and discount type is: {$self}'
-  )
-    .with([DiscountTypesEnum.Fixed, DiscountTypesEnum.Percent] as DiscountType[])
-    .run(({ assert }, discountType) => {
-      const description = 'Invalid Discount Value'
-      assert.throws(
-        () =>
-          PricingCalculator.calculateLine({
-            description,
-            quantity: 1,
-            unitPrice: 50,
-            discountType: discountType,
-            discountValue: 0,
-            taxPercent: 10,
-          }),
-        CalculationError,
-        `Discount value must be greater than zero when discount type is "${discountType}" for line: "${description}"`
-      )
-    })
-    .tags(['pricing_calculator'])
+  test('should test the `calculateLine` method and throw CalculationError when discount type is "fixed" but value is missing or <= 0', ({
+    assert,
+  }) => {
+    const description = 'Invalid Fixed Discount'
+    assert.throws(
+      () =>
+        PricingCalculator.calculateLine({
+          description,
+          quantity: 1,
+          unitPrice: 50,
+          discountType: DiscountTypesEnum.Fixed,
+          discountValueFixed: 0,
+          discountValuePercent: null,
+          taxPercent: 0,
+        }),
+      CalculationError,
+      `Fixed discount value must be provided and greater than 0 when discount type is "fixed" for line: "${description}"`
+    )
+  }).tags(['pricing_calculator'])
+
+  test('should test the `calculateLine` method and throw CalculationError when discount type is "fixed" but percent value is also provided', ({
+    assert,
+  }) => {
+    const description = 'Conflicting Discount Fields'
+    assert.throws(
+      () =>
+        PricingCalculator.calculateLine({
+          description,
+          quantity: 1,
+          unitPrice: 50,
+          discountType: DiscountTypesEnum.Fixed,
+          discountValueFixed: 10,
+          discountValuePercent: 5,
+          taxPercent: 0,
+        }),
+      CalculationError,
+      `Percentage discount value must be null when discount type is "fixed" for line: "${description}"`
+    )
+  }).tags(['pricing_calculator'])
+
+  test('should test the `calculateLine` method and throw CalculationError when discount type is "percent" but value is invalid or <= 0', ({
+    assert,
+  }) => {
+    const description = 'Invalid Percent Discount'
+    assert.throws(
+      () =>
+        PricingCalculator.calculateLine({
+          description,
+          quantity: 1,
+          unitPrice: 50,
+          discountType: DiscountTypesEnum.Percent,
+          discountValueFixed: null,
+          discountValuePercent: 0,
+          taxPercent: 0,
+        }),
+      CalculationError,
+      `Percentage discount value must be greater than 0 and at most 100 when discount type is "percent" for line: "${description}"`
+    )
+
+    assert.throws(
+      () =>
+        PricingCalculator.calculateLine({
+          description,
+          quantity: 1,
+          unitPrice: 50,
+          discountType: DiscountTypesEnum.Percent,
+          discountValueFixed: null,
+          discountValuePercent: 120,
+          taxPercent: 0,
+        }),
+      CalculationError,
+      `Percentage discount value must be greater than 0 and at most 100 when discount type is "percent" for line: "${description}"`
+    )
+  }).tags(['pricing_calculator'])
+
+  test('should test the `calculateLine` method and throw CalculationError when discount type is "percent" but fixed value is also provided', ({
+    assert,
+  }) => {
+    const description = 'Conflicting Discount Fields'
+    assert.throws(
+      () =>
+        PricingCalculator.calculateLine({
+          description,
+          quantity: 1,
+          unitPrice: 50,
+          discountType: DiscountTypesEnum.Percent,
+          discountValueFixed: 10,
+          discountValuePercent: 10,
+          taxPercent: 0,
+        }),
+      CalculationError,
+      `Fixed discount value must be null when discount type is "percent" for line: "${description}"`
+    )
+  }).tags(['pricing_calculator'])
 })
