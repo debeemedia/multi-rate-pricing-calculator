@@ -8,7 +8,7 @@ import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 
 export class DocumentLineItemSchema extends BaseModel {
-  static $columns = ['createdAt', 'description', 'discount', 'discountType', 'discountValue', 'documentId', 'id', 'lineTotal', 'quantity', 'subtotal', 'tax', 'taxPercent', 'unitPrice', 'updatedAt'] as const
+  static $columns = ['createdAt', 'description', 'discount', 'discountType', 'discountValueFixed', 'discountValuePercent', 'documentId', 'id', 'lineTotal', 'quantity', 'subtotal', 'tax', 'taxPercent', 'unitPrice', 'updatedAt'] as const
   $columns = DocumentLineItemSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -19,7 +19,9 @@ export class DocumentLineItemSchema extends BaseModel {
   @column()
   declare discountType: string
   @column()
-  declare discountValue: bigint | number
+  declare discountValueFixed: bigint | number | null
+  @column()
+  declare discountValuePercent: string | null
   @column()
   declare documentId: string
   @column({ isPrimary: true })

@@ -8,33 +8,88 @@ export const documentLineItemSchema = vine.object({
   quantity: vine.number().min(1),
   unitPrice: vine.number().min(0),
   discountType: vine.enum(discountTypes).optional(),
-  discountValue: vine
+  discountValueFixed: vine
     .number()
     .min(0)
+    .nullable()
     .optional()
     .transform((value, field) => {
-      const discountType = field.parent.discountType
+      const parent = field.parent
+      const discountType = parent.discountType || DiscountTypesEnum.None
 
-      if (discountType === DiscountTypesEnum.None && value && value > 0) {
+      if (discountType === DiscountTypesEnum.None) {
+        if (value !== null && value !== undefined) {
+          field.report(
+            `Fixed discount value must be null when discount type is set to "${DiscountTypesEnum.None}"`,
+            'invalid_discount_value_fixed',
+            field
+          )
+        }
+        return null // Explicitly force output to null for DB constraint
+      }
+
+      if (discountType === DiscountTypesEnum.Fixed && (!value || value <= 0)) {
         field.report(
-          'Cannot provide a discount value when discount type is set to "none"',
-          'invalid_discount_value',
+          `Must provide a fixed discount value greater than 0 when discount type is set to "${DiscountTypesEnum.Fixed}"`,
+          'invalid_discount_value_fixed',
           field
         )
       }
 
-      if (
-        [DiscountTypesEnum.Fixed, DiscountTypesEnum.Percent].includes(discountType) &&
-        (!value || value <= 0)
-      ) {
+      if (discountType === DiscountTypesEnum.Percent) {
+        if (value !== null && value !== undefined) {
+          field.report(
+            `Fixed discount value must be null when discount type is set to "${DiscountTypesEnum.Percent}"`,
+            'invalid_discount_value_fixed',
+            field
+          )
+        }
+        return null // Explicitly force output to null for DB constraint
+      }
+
+      return value ?? null
+    }),
+  discountValuePercent: vine
+    .number()
+    .min(0)
+    .max(100)
+    .nullable()
+    .optional()
+    .transform((value, field) => {
+      const parent = field.parent
+      const discountType = parent.discountType || DiscountTypesEnum.None
+
+      if (discountType === DiscountTypesEnum.None) {
+        if (value !== null && value !== undefined) {
+          field.report(
+            `Percentage discount value must be null when discount type is set to "${DiscountTypesEnum.None}"`,
+            'invalid_discount_value_percent',
+            field
+          )
+        }
+        return null // Explicitly force output to null for DB constraint
+      }
+
+      if (discountType === DiscountTypesEnum.Fixed) {
+        if (value !== null && value !== undefined) {
+          field.report(
+            `Percentage discount value must be null when discount type is set to "${DiscountTypesEnum.Fixed}"`,
+            'invalid_discount_value_percent',
+            field
+          )
+        }
+        return null // Explicitly force output to null for DB constraint
+      }
+
+      if (discountType === DiscountTypesEnum.Percent && (!value || value <= 0 || value > 100)) {
         field.report(
-          'Must provide a discount value greater than 0 when discount type is set to "fixed" or "percent"',
-          'invalid_discount_value',
+          `Must provide a percentage discount value greater than 0 and at most 100 when discount type is set to "${DiscountTypesEnum.Percent}"`,
+          'invalid_discount_value_percent',
           field
         )
       }
 
-      return value
+      return value ?? null
     }),
   taxPercent: vine.number().min(0).max(100).optional(),
 })

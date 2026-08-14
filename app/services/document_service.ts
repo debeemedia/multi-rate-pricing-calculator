@@ -70,7 +70,8 @@ export default class DocumentService {
             taxAmount,
             unitPrice,
             discountType,
-            discountValue,
+            discountValueFixed,
+            discountValuePercent,
             taxPercent,
           } = item
           await DocumentLineItem.create(
@@ -80,7 +81,11 @@ export default class DocumentService {
               quantity,
               unitPrice,
               discountType: discountType || DiscountTypesEnum.None,
-              discountValue: discountValue || 0,
+              discountValueFixed: discountValueFixed ?? null,
+              discountValuePercent:
+                discountValuePercent !== null && discountValuePercent !== undefined
+                  ? discountValuePercent.toFixed(2)
+                  : null,
               taxPercent: (taxPercent || 0).toFixed(2),
               subtotal,
               discount: discountAmount,
@@ -114,7 +119,9 @@ export default class DocumentService {
       quantity: item.quantity,
       unitPrice: item.unitPrice,
       discountType: item.discountType as DiscountType,
-      discountValue: item.discountValue,
+      discountValueFixed: item.discountValueFixed,
+      discountValuePercent:
+        item.discountValuePercent !== null ? Number(item.discountValuePercent) : null,
       taxPercent: Number(item.taxPercent),
     }))
 
@@ -202,9 +209,16 @@ export default class DocumentService {
         taxAmount,
         unitPrice,
         discountType,
-        discountValue,
+        discountValueFixed,
+        discountValuePercent,
         taxPercent,
       } = calculated
+
+      console.log('Payload passing to Lucid:', {
+        discountType: calculated.discountType,
+        discountValueFixed: calculated.discountValueFixed,
+        discountValuePercent: calculated.discountValuePercent,
+      })
 
       const lineItem = await DocumentLineItem.create(
         {
@@ -213,7 +227,11 @@ export default class DocumentService {
           quantity,
           unitPrice,
           discountType: discountType || DiscountTypesEnum.None,
-          discountValue: discountValue || 0,
+          discountValueFixed: discountValueFixed ?? null,
+          discountValuePercent:
+            discountValuePercent !== null && discountValuePercent !== undefined
+              ? discountValuePercent.toFixed(2)
+              : null,
           taxPercent: (taxPercent || 0).toFixed(2),
           subtotal,
           discount: discountAmount,

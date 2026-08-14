@@ -13,7 +13,8 @@ export interface LineItemInput {
   quantity: number
   unitPrice: number
   discountType?: DiscountType
-  discountValue?: number
+  discountValueFixed?: number | null
+  discountValuePercent?: number | null
   taxPercent?: number
 }
 

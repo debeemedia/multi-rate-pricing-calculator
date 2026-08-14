@@ -43,3 +43,7 @@ export default class extends BaseSchema {
     this.schema.dropTable(this.tableName)
   }
 }
+
+/**
+ * IMPORTANT NOTE: In a subsequent migration, the `discount_value` column has been replaced with `discount_value_fixed` (bigint, for fixed discount type) and `discount_value_percent` (numeric(5,2), for percent discount type).
+ */

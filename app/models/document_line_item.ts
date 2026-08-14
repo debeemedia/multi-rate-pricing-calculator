@@ -3,7 +3,7 @@ import { beforeCreate, belongsTo, column } from '@adonisjs/lucid/orm'
 import { DocumentLineItemSchema } from '#database/schema'
 import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 import Document from './document.ts'
-import { dynamicDiscountColumnConfig, moneyColumnConfig } from '#helpers/model_helper'
+import { moneyColumnConfig } from '#helpers/model_helper'
 
 export default class DocumentLineItem extends DocumentLineItemSchema {
   /**
@@ -14,13 +14,10 @@ export default class DocumentLineItem extends DocumentLineItemSchema {
   })
   declare unitPrice: number
 
-  /**
-   * IMPORTANT: Conversion of `discountValue` to minor unit depends on the `discountType`
-   */
   @column({
-    ...dynamicDiscountColumnConfig,
+    ...moneyColumnConfig,
   })
-  declare discountValue: number
+  declare discountValueFixed: number | null
 
   @column({
     ...moneyColumnConfig,
