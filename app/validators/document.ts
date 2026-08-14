@@ -22,10 +22,17 @@ const maxTwoDecimals = vine.createRule((value, _, field) => {
   }
 })
 
+// Enforces whole number integer
+const isInteger = vine.createRule((value, _options, field) => {
+  if (typeof value !== 'number' || !Number.isInteger(value)) {
+    field.report('Quantity must be a whole number', 'integer', field)
+  }
+})
+
 // Document line item schema
 export const documentLineItemSchema = vine.object({
   description: vine.string().trim().minLength(1).maxLength(100),
-  quantity: vine.number().min(1),
+  quantity: vine.number().min(1).use(isInteger()),
   unitPrice: vine.number().min(0).use(maxTwoDecimals()),
   discountType: vine.enum(discountTypes).optional(),
   discountValueFixed: vine
