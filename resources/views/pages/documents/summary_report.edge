@@ -8,7 +8,6 @@
       </div>
     </div>
     {{-- Error Banner --}}
-    {{-- Ensure to flash the error here since we did not flash in the controller; we used the errorMessage variable. --}}
     @assign(activeError = errorMessage || flashMessages.get('error'))
     @if(activeError)
       <div class="alert alert-destructive mb-4">
@@ -50,7 +49,7 @@
         </div>
       </form>
     </div>
-    {{-- Active Date Scope Context Note --}}
+    {{-- Active Date Scope & Calculation Policy Bar --}}
     <div class="report-context-bar mb-3">
       <span class="context-pill">
         Showing metrics for
@@ -74,6 +73,9 @@
           @end
         </strong>
       </span>
+      <div class="mt-2" style="font-size: 0.85rem; opacity: 0.9; line-height: 1.4;">
+        <strong>Calculation Policy:</strong> Total Subtotal represents gross line amounts before deductions or taxes. Discounts are deducted first to derive the net taxable amount, after which tax is calculated and added to form the Sum of Grand Totals (final payable total).
+      </div>
     </div>
     {{-- Aggregated Metrics Cards --}}
     <div class="metrics-grid">
@@ -84,7 +86,6 @@
 
       <div class="metric-card">
         <span class="metric-label">Total Subtotal</span>
-        <div><small>(Before discounts & tax)</small></div>
         <span class="metric-value font-mono">
           ${{ Number(report.aggregateSubtotal || 0).toFixed(2) }}
         </span>
@@ -106,7 +107,6 @@
 
       <div class="metric-card highlight">
         <span class="metric-label">Sum of Grand Totals</span>
-        <div><small>(Final payable amount after discounts & tax)</small></div>
         <span class="metric-value font-mono">
           ${{ Number(report.aggregateGrandTotal || 0).toFixed(2) }}
         </span>
