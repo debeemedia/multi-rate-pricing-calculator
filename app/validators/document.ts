@@ -8,7 +8,7 @@ import { DateTime } from 'luxon'
 const stripTags = vine.createRule((value, _options, field) => {
   if (typeof value === 'string') {
     const cleanValue = value.replace(/<[^>]*>?/gm, '')
-    field.mutate(cleanValue)
+    field.mutate(cleanValue, field.meta)
   }
 }, { isAsync: false })
 
