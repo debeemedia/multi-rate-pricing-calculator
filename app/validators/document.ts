@@ -25,7 +25,11 @@ const maxTwoDecimals = vine.createRule((value, _, field) => {
 // Document line item schema
 export const documentLineItemSchema = vine.object({
   description: vine.string().trim().minLength(1).maxLength(100),
-  quantity: vine.number().integer().min(1),
+  quantity: vine.number().min(1).use((value, _options, field) => {
+    if (!Number.isInteger(value)) {
+      field.report('Quantity must be a whole number', 'integer', field)
+    }
+  }),
   unitPrice: vine.number().min(0).use(maxTwoDecimals()),
   discountType: vine.enum(discountTypes).optional(),
   discountValueFixed: vine
