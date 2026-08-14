@@ -1,6 +1,6 @@
 # Multi-Rate Pricing Calculator
 
-A web application built with AdonisJS v6, TypeScript, and PostgreSQL that lets users manage documents, compute multi-rate line-item discounts and taxes server-side, maintain strict lifecycle immutability for finalized documents, and generate summary reports.
+A web application built with AdonisJS v7, TypeScript, and PostgreSQL that lets users manage documents, compute multi-rate line-item discounts and taxes server-side, maintain strict lifecycle immutability for finalized documents, and generate summary reports.
 
 ## Live Demo & Repository
 
@@ -11,7 +11,7 @@ Repository: [https://github.com/debeemedia/multi-rate-pricing-calculator](https:
 ## Tech Stack & Architectural Choices
 
 - **AdonisJS v7 (Node.js):** Selected for its batteries-included, cohesive ecosystem. Having native, first-party modules for authentication, validation (VineJS), ORM (Lucid), templating (Edge), and testing (Japa) eliminated third-party dependency bloat and guaranteed architectural consistency across the monolith.
-- **PostgreSQL:** Chosen for relational data integrity (enforcing foreign keys between documents and line items), transactional safety when locking finalized records, and efficient composite indexing for financial summary queries.
+- **PostgreSQL:** Chosen for relational data integrity (enforcing foreign keys between documents and line items), transactional safety when locking finalized records, dynamic check constraints, and efficient composite indexing for financial summary queries.
 
 ## Features Implemented
 
@@ -28,12 +28,13 @@ Repository: [https://github.com/debeemedia/multi-rate-pricing-calculator](https:
 
 To eliminate floating-point drift:
 
-- All monetary values (`unit_price`, `subtotal`, `discount`, `tax`, and `line_total`) are stored as integers (BigInt) in minor units (e.g. cents) in PostgreSQL. For example, $100.00 is stored as 10000.
-- The `discount_value` column is stored as an integer (BigInt). The application inspects `discount_type` (fixed vs percent) to handle the conversion:
-  - If fixed: converted from major unit ($) to minor unit (cents) before storage.
-  - If percent: stored directly as the percentage integer/decimal value (e.g., 10 for 10%).
+- All monetary values (`unit_price`, `subtotal`, `discount`, `tax`, and `line_total`) are stored as integers (BigInt) in minor units (e.g. cents) in PostgreSQL. For example, $100.00 is stored as `10000`.
+- Discounts use mutually exclusive columns governed by database check constraints:
+  - `discount_value_fixed`: Stored as integer minor units (cents) when `discount_type` is `'fixed'`.
+  - `discount_value_percent`: Stored as a decimal numeric type when `discount_type` is `'percent'`.
+  - When `discount_type` is `'none'`, both columns evaluate to `NULL`.
 - Tax percentages (`tax_percent`) are stored as decimal numeric types.
-- The `PricingCalculatorService` performs all arithmetic in minor units (e.g. cents). Amounts are stored as integer minor units in PostgreSQL and automatically converted to major units by ORM model hooks when hydrated (or manually converted via `PricingCalculatorService` when executing raw SQL queries).
+- The `PricingCalculatorService` is the single source of truth for all arithmetic. Column transformers, via the service, convert values between minor units for database storage and major units (dollars) for model consumption.
 
 ### 2. Per-Line Order of Operations
 
