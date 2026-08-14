@@ -10,8 +10,10 @@ Repository: [https://github.com/debeemedia/multi-rate-pricing-calculator](https:
 
 ## Tech Stack & Architectural Choices
 
-- **AdonisJS v7 (Node.js):** Selected for its batteries-included, cohesive ecosystem. Having native, first-party modules for authentication, validation (VineJS), ORM (Lucid), templating (Edge), and testing (Japa) eliminated third-party dependency bloat and guaranteed architectural consistency across the monolith.
-- **PostgreSQL:** Chosen for relational data integrity (enforcing foreign keys between documents and line items), transactional safety when locking finalized records, dynamic check constraints, and efficient composite indexing for financial summary queries.
+- **AdonisJS v7 (Node.js) & TypeScript:** Selected for its batteries-included, cohesive ecosystem and native TypeScript support for end-to-end type safety. Featuring first-party modules for authentication, validation (VineJS), ORM (Lucid), templating (Edge), and testing (Japa) that eliminated third-party dependency bloat and guaranteed architectural consistency across the monolith.
+- **PostgreSQL & Supabase:** Chosen for relational data integrity (enforcing foreign keys between documents and line items), transactional safety when locking finalized records, dynamic check constraints, and efficient composite indexing for financial summary queries. Hosted via Supabase for scalable cloud persistence and connection management.
+- **Custom CSS (Design System):** Lightweight styling using native CSS Grid, Flexbox, and modern color variables to deliver a fully responsive UI across mobile and desktop with zero framework bloat.
+- **Render:** Selected for rapid, live demo deployment.
 
 ## Features Implemented
 
