@@ -79,7 +79,7 @@ main {
   width: calc(100% - 40px); /* Keeps fluid padding on the sides */
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start; /* Stacks content from top down, preventing vertical gaps on short pages or empty states */
   min-height: calc(100vh - 65px);
   background: #fff;
   border: 1px solid var(--gray-3);
@@ -781,9 +781,6 @@ summary_report.edge styles
   max-width: 1100px;
   margin: 0 auto;
   width: 100%;
-
-  /* Prevents flex space-between from pulling content down */
-  margin-bottom: auto;
 }
 
 .report-header-row {
