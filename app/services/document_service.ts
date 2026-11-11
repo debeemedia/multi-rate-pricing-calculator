@@ -5,6 +5,8 @@ import { PricingCalculator } from '#services/pricing_calculator_service'
 import { DiscountType, DiscountTypesEnum, DocumentStatusesEnum, LineItemInput } from '#types/index'
 import { DateTime } from 'luxon'
 import { TransactionClientContract } from '@adonisjs/lucid/types/database'
+import { ModelQueryBuilderContract } from '@adonisjs/lucid/types/model'
+import { SupportedCurrencyCode } from '#models/currency'
 
 export class DocumentError extends Error {
   public status: number
@@ -27,9 +29,10 @@ export default class DocumentService {
       customerName: string
       issueDate: DateTime
       lineItems?: LineItemInput[]
+      currencyCode: SupportedCurrencyCode
     }
   ) {
-    const { customerName, issueDate, title, lineItems } = data
+    const { customerName, issueDate, title, lineItems, currencyCode } = data
     return await db.transaction(async (trx) => {
       // 1. Create base document draft
       const document = await Document.create(
@@ -39,6 +42,7 @@ export default class DocumentService {
           customerName,
           issueDate,
           status: DocumentStatusesEnum.Draft,
+          currencyCode,
         },
         { client: trx }
       )
@@ -266,19 +270,35 @@ export default class DocumentService {
   }
 
   /**
-   * Generates Summary Report for Finalized Documents in Date Range
+   * Generates Summary Report for Finalized Documents in Date Range and Currency
    */
-  public async getSummaryReport(userId: string, startDate: DateTime, endDate: DateTime) {
-    const startIso = startDate.startOf('day').toISO()
-    const endIso = endDate.endOf('day').toISO()
+  public async getSummaryReport({
+    userId,
+    currencyCode,
+    startDate,
+    endDate,
+  }: {
+    userId: string
+    currencyCode: SupportedCurrencyCode
+    startDate?: DateTime
+    endDate?: DateTime
+  }) {
+    const query = db.from('documents').where({
+      user_id: userId,
+      status: DocumentStatusesEnum.Finalized,
+      currency_code: currencyCode,
+    })
 
-    const result = await db
-      .from('documents')
-      .where({
-        user_id: userId,
-        status: DocumentStatusesEnum.Finalized,
-      })
-      .whereBetween('issue_date', [startIso!, endIso!])
+    // IMPORTANT: Use the "isValid" check as an additional defensive guard against weird values that can sneak through and consequently lead to rendering incorrect results
+    if (startDate && startDate.isValid) {
+      query.where('issue_date', '>=', startDate.startOf('day').toISO()!)
+    }
+
+    if (endDate && endDate.isValid) {
+      query.where('issue_date', '<=', endDate.endOf('day').toISO()!)
+    }
+
+    const result = await query
       .select(
         db.raw('COUNT(*)::integer as total_documents'),
         db.raw('COALESCE(SUM(total_discount), 0) as aggregate_total_discount'),
@@ -288,13 +308,17 @@ export default class DocumentService {
       .first()
 
     return {
-      startDate,
-      endDate,
       totalDocuments: Number(result.total_documents),
       // IMPORTANT: Ensure to convert amount-related columns to main unit since we bypassed the Model
       aggregateTotalDiscount: PricingCalculator.toMainUnit(Number(result.aggregate_total_discount)),
       aggregateTotalTax: PricingCalculator.toMainUnit(Number(result.aggregate_total_tax)),
       aggregateGrandTotal: PricingCalculator.toMainUnit(Number(result.aggregate_grand_total)),
     }
+  }
+
+  public static preloadCurrencyRelation(query: ModelQueryBuilderContract<typeof Document>) {
+    return query.preload('currency', (currencyQuery) => {
+      currencyQuery.select(['code', 'symbol'])
+    })
   }
 }

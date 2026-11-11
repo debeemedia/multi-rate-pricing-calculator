@@ -21,7 +21,7 @@ Repository: [https://github.com/debeemedia/multi-rate-pricing-calculator](https:
 - **Server-Side Financial Engine:** Integer-based minor unit (e.g cent) representation avoiding JavaScript IEEE 754 floating-point drift.
 - **Strict Document Lifecycle:** Draft documents are fully editable; finalized documents become immutable across both UI and API levels.
 - **Document Invoice PDF Generation:** Combines documents and line items data, with allowance for user input of additional data e.g payment terms, bank details etc. via a form, to generate an invoice PDF (with Puppeteer) for download.
-- **Date-Bounded Summary Reporting:** Aggregates metrics (Total Documents, Revenue, Discounts, Tax) across customizable date ranges, with composite index on relevant columns (`user_id, issue_date, status`) for fast lookups.
+- **Date-Bounded Summary Reporting:** Aggregates metrics (Total Documents, Revenue, Discounts, Tax) across customizable currencies and date ranges, with composite index on relevant columns (`user_id, issue_date, status`, `currency_code`) for fast lookups.
 - **Responsive & Intuitive UI:** Modern, mobile-first CSS architecture featuring adaptive grid systems, seamless media query breakpoints, and clear visual navigation across all viewport sizes.
 - **System Health Monitoring:** Exposes a lightweight `GET /health` endpoint for server uptime and database connectivity checks.
 
@@ -214,7 +214,15 @@ CREATE DATABASE multi_rate_pricing_calculator;
 node ace migration:run
 ```
 
-**6. Run the Application:**
+**6. Run Seeders:**
+
+```bash
+node ace db:seed
+```
+
+This will seed the database with data needed for the application to run e.g. currencies.
+
+**7. Run the Application:**
 
 ```bash
 npm run dev
@@ -313,9 +321,9 @@ The base URL for all API requests is: `https://hive-docs.onrender.com`
 
 ### Summary Reports
 
-| Method | Endpoint                     | Description                                                                   |
-| :----- | :--------------------------- | :---------------------------------------------------------------------------- |
-| `GET`  | `/documents/reports/summary` | Query summary report with optional `startDate` and `endDate` ISO query params |
+| Method | Endpoint                     | Description                                                                                                               |
+| :----- | :--------------------------- | :------------------------------------------------------------------------------------------------------------------------ |
+| `GET`  | `/documents/reports/summary` | Query summary report with optional `startDate`, `endDate` and `currencyCode` (defaults to base currency) ISO query params |
 
 ---
 
@@ -329,6 +337,7 @@ The base URL for all API requests is: `https://hive-docs.onrender.com`
   "title": "Invoice #1001",
   "customerName": "Acme Corp",
   "issueDate": "2026-08-14",
+  "currencyCode": "USD",
   // optional
   "lineItems": [
     {
@@ -353,6 +362,7 @@ Success Response: 201 Created
     "title": "Invoice #1001",
     "customerName": "Acme Corp",
     "issueDate": "2026-08-14T00:00:00.000Z",
+    "currencyCode": "USD",
     "status": "draft",
     "id": "5b5ded4b-810e-42c5-aff9-b4dd2b6a5061",
     "createdAt": "2026-08-14T14:10:25.312+00:00",
@@ -446,7 +456,7 @@ node ace test unit
 
 **3. UTC Boundary Normalization for Reports:**
 
-- _**Decision:**_ Date filter bounds (`startDate` and `endDate`) are parsed using UTC timezone logic and forcibly expanded: `startDate` defaults to `00:00:00.000` (start of current month) and `endDate` expands to `23:59:59.999` (end of current day).
+- _**Decision:**_ Date filter bounds (`startDate` and `endDate`) are parsed using UTC timezone logic: `startDate` expands to `00:00:00.000` (start of day) and `endDate` expands to `23:59:59.999` (end of day).
 
 - _**Tradeoff:**_ Guarantees SQL `BETWEEN` timestamps capture all documents issued on the selected end date without truncating records created later in the day, regardless of server timezone differences.
 
@@ -462,12 +472,6 @@ node ace test unit
 
 - _Tradeoff:_ Simplifies route management and controller logic for a server-rendered application, though dedicated public client API consumption in the future would benefit from strict URI version segregation.
 
-**6. Currency Formatting & Localization Assumptions:**
-
-- _**Decision:**_ The calculation engine operates strictly on abstract minor integer units (e.g. cents/kobo). Lucid ORM hooks handle conversions to major units for storage and minor units during serialization. The HTML views default to USD formatting (`$`).
-
-- _**Tradeoff:**_ Documents are currently bound to a single hardcoded currency symbol (`$`) rather than supporting dynamic per-document ISO currency codes (e.g., `USD`, `EUR`, `NGN`).
-
 ## What I Would Improve Before Production
 
 **1. Infrastructure & VPS Deployment (Docker & Containerization):**
@@ -479,9 +483,9 @@ node ace test unit
 
 - While unit tests cover the calculation service exhaustively, adding integration test cases for all the API endpoints will ensure that the expected response structure is always returned. Adding browser tests with Playwright for full UI flows e.g. (sign up $\rightarrow$ document list $\rightarrow$ document creation $\rightarrow$ adding line items $\rightarrow$ finalization immutability check) would prevent regression bugs on view interactions.
 
-**3. Multi-Currency & ISO Code Support:**
+**3. Base Currency Exchange Rate Freeze:**
 
-- Bind each document to an explicit ISO currency code (`USD`, `EUR`, `NGN`) and record a frozen exchange rate against the account's base currency upon finalization. This enables multi-currency invoicing while allowing account-level summary reports to aggregate with a single base currency.
+- Currently each document is bound to an explicit ISO currency code (e.g. `USD`, `EUR`, `NGN`) and aggregated summary reports are filtered on a currency basis. In future, record a frozen exchange rate against the account's base currency upon finalization. This will allow account-level summary reports to aggregate with a single base currency in our multi-currency invoicing setup.
 
 **4. Asynchronous Worker for the Export Generation:**
 

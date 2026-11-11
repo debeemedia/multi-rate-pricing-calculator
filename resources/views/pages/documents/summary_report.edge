@@ -4,6 +4,7 @@
     <div class="report-header-row mb-4">
       <div>
         <a href="{{ route('documents.index') }}" class="back-link">← Back to Documents List</a>
+
         <h1 class="page-title mt-4">Document Summary Report</h1>
       </div>
     </div>
@@ -23,6 +24,7 @@
         <div class="report-filter-grid">
           <div class="form-field">
             <label for="startDate">Issue Date From</label>
+
             <input
               type="date"
               id="startDate"
@@ -33,6 +35,7 @@
 
           <div class="form-field">
             <label for="endDate">Issue Date To</label>
+
             <input
               type="date"
               id="endDate"
@@ -40,6 +43,27 @@
               value="{{ filters.endDate || '' }}"
               class="{{ activeError ? 'input-error' : '' }}"
             />
+          </div>
+
+          <div class="form-field">
+            <label for="currencyCode">Currency</label>
+            <select id="currencyCode" name="currencyCode" class="form-select">
+              @each(currency in supportedCurrencies)
+                <option
+                  value="{{ currency.code }}"
+                  {{
+                    filters.currencyCode === currency.code ||
+                    (!filters.currencyCode && defaultCurrencyCode === currency.code)
+                      ? 'selected'
+                      : ''
+                  }}
+                >
+                  {{ currency.code }}
+                  ({{ currency.symbol }}) —
+                  {{ currency.name }}
+                </option>
+              @end
+            </select>
           </div>
 
           <div class="filter-actions">
@@ -52,26 +76,33 @@
     {{-- Active Date Scope Pill --}}
     <div class="report-context-bar">
       <span class="context-pill">
+        
         Showing metrics for
-        <strong>finalized</strong>
-        documents with
-        <strong>issue date</strong>
-        between:
-        <strong>
-          @if(filters.startDate && filters.endDate)
-            {{ filters.startDate }}
-            and
-            {{ filters.endDate }}
-          @elseif(filters.startDate)
-            {{ filters.startDate }}
-            onwards
-          @elseif(filters.endDate)
-            Up to
-            {{ filters.endDate }}
-          @else
-            All-Time (Default)
-          @end
-        </strong>
+
+        <strong>finalized {{ filters.currencyCode }}</strong>
+        
+         documents
+
+
+        @if(filters.startDate && filters.endDate)
+          with
+          <strong>issue date</strong>
+          between
+          <strong>{{ filters.startDate }} and {{ filters.endDate }}</strong>
+        @elseif(filters.startDate)
+          with
+          <strong>issue date</strong>
+          from
+          <strong>{{ filters.startDate }} onwards</strong>
+        @elseif(filters.endDate)
+          with
+          <strong>issue date</strong>
+          up to
+          <strong>{{ filters.endDate }}</strong>
+        @else
+          for
+          <strong>All-Time (Default)</strong>
+        @end
       </span>
     </div>
     {{-- Aggregated Metrics Cards --}}
@@ -84,21 +115,36 @@
       <div class="metric-card">
         <span class="metric-label">Total Discounts</span>
         <span class="metric-value font-mono">
-          -${{ Number(report.aggregateTotalDiscount || 0).toFixed(2) }}
+          -{{ filters.currencySymbol }}{{
+            Number(report.aggregateTotalDiscount || 0).toLocaleString(
+              'en-NG',
+              { minimumFractionDigits: 2, maximumFractionDigits: 2 },
+            )
+          }}
         </span>
       </div>
 
       <div class="metric-card">
         <span class="metric-label">Total Tax</span>
         <span class="metric-value font-mono">
-          ${{ Number(report.aggregateTotalTax || 0).toFixed(2) }}
+          {{ filters.currencySymbol }}{{
+            Number(report.aggregateTotalTax || 0).toLocaleString('en-NG', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })
+          }}
         </span>
       </div>
 
       <div class="metric-card highlight">
         <span class="metric-label">Sum of Grand Totals</span>
         <span class="metric-value font-mono">
-          ${{ Number(report.aggregateGrandTotal || 0).toFixed(2) }}
+          {{ filters.currencySymbol }}{{
+            Number(report.aggregateGrandTotal || 0).toLocaleString('en-NG', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })
+          }}
         </span>
       </div>
     </div>

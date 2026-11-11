@@ -7,6 +7,27 @@
 import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 
+export class CurrencySchema extends BaseModel {
+  static $columns = ['code', 'createdAt', 'decimalDigits', 'id', 'isSupported', 'name', 'symbol', 'updatedAt'] as const
+  $columns = CurrencySchema.$columns
+  @column()
+  declare code: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare decimalDigits: number
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare isSupported: boolean
+  @column()
+  declare name: string
+  @column()
+  declare symbol: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime
+}
+
 export class DocumentLineItemSchema extends BaseModel {
   static $columns = ['createdAt', 'description', 'discount', 'discountType', 'discountValueFixed', 'discountValuePercent', 'documentId', 'id', 'lineTotal', 'quantity', 'subtotal', 'tax', 'taxPercent', 'unitPrice', 'updatedAt'] as const
   $columns = DocumentLineItemSchema.$columns
@@ -43,10 +64,12 @@ export class DocumentLineItemSchema extends BaseModel {
 }
 
 export class DocumentSchema extends BaseModel {
-  static $columns = ['createdAt', 'customerName', 'grandTotal', 'id', 'issueDate', 'status', 'subtotal', 'title', 'totalDiscount', 'totalTax', 'updatedAt', 'userId'] as const
+  static $columns = ['createdAt', 'currencyCode', 'customerName', 'grandTotal', 'id', 'issueDate', 'status', 'subtotal', 'title', 'totalDiscount', 'totalTax', 'updatedAt', 'userId'] as const
   $columns = DocumentSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
+  @column()
+  declare currencyCode: string
   @column()
   declare customerName: string
   @column()

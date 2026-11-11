@@ -5,6 +5,7 @@ import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
 import User from './user.ts'
 import DocumentLineItem from './document_line_item.ts'
 import { moneyColumnConfig } from '#helpers/model_helper'
+import Currency from './currency.ts'
 
 export default class Document extends DocumentSchema {
   /**
@@ -30,6 +31,9 @@ export default class Document extends DocumentSchema {
 
   @belongsTo(() => User)
   declare user: BelongsTo<typeof User>
+
+  @belongsTo(() => Currency, { foreignKey: 'currencyCode', localKey: 'code' })
+  declare currency: BelongsTo<typeof Currency>
 
   @hasMany(() => DocumentLineItem)
   declare documentLineItems: HasMany<typeof DocumentLineItem>

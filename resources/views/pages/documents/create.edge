@@ -55,6 +55,33 @@
           @end
         </div>
 
+        <div class="field-group">
+          <label for="currencyCode">Currency</label>
+          <select
+            id="currencyCode"
+            name="currencyCode"
+            data-invalid="{{ flashMessages.has('errors.currencyCode') ? 'true' : 'false' }}"
+            required
+          >
+            <option value="" disabled {{ !old('currencyCode') ? 'selected' : '' }}>
+              Select currency
+            </option>
+            @each(currency in supportedCurrencies)
+              <option
+                value="{{ currency.code }}"
+                {{ old('currencyCode') === currency.code ? 'selected' : '' }}
+              >
+                {{ currency.code }}
+                ({{ currency.symbol }}) —
+                {{ currency.name }}
+              </option>
+            @end
+          </select>
+          @if(flashMessages.has('errors.currencyCode'))
+            <div class="field-error">{{ flashMessages.get('errors.currencyCode') }}</div>
+          @end
+        </div>
+
         <div class="form-actions">
           <button type="submit" class="button">Create Document Draft</button>
           <a href="{{ route('documents.index') }}" class="button secondary">Cancel</a>
