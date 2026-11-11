@@ -491,7 +491,7 @@ node ace test unit
 
 - Bind each document to an explicit ISO currency code (`USD`, `EUR`, `NGN`) and record a frozen exchange rate against the account's base currency upon finalization. This enables multi-currency invoicing while allowing account-level summary reports to aggregate with a single base currency.
 
-**4. Asynchronous Export Generation:**
+**4. Asynchronous Worker for the Export Generation:**
 
 - Generation of downloadable PDF invoices is currently supported; move this into an asynchronous background worker (e.g. BullMQ).
 
