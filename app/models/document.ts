@@ -32,7 +32,7 @@ export default class Document extends DocumentSchema {
   @belongsTo(() => User)
   declare user: BelongsTo<typeof User>
 
-  @belongsTo(() => Currency, { foreignKey: 'currency_code' })
+  @belongsTo(() => Currency, { foreignKey: 'currencyCode', localKey: 'code' })
   declare currency: BelongsTo<typeof Currency>
 
   @hasMany(() => DocumentLineItem)
