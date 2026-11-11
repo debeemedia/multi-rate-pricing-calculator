@@ -2,32 +2,8 @@
   <div>
     <div>
       @link({ route: 'home', text: 'Home' })
-        <svg
-          width="120"
-          height="28"
-          viewBox="0 0 140 36"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          aria-label="CrossVal"
-        >
-          <text
-            x="0"
-            y="25"
-            fill="currentColor"
-            font-family="system-ui, -apple-system, sans-serif"
-            font-weight="800"
-            font-size="22"
-            letter-spacing="-0.8px"
-          >
-            
-            
-            
-      CROSS
-
-
-            <tspan fill-opacity="0.75" font-weight="300">/VAL</tspan>
-          </text>
-        </svg>
+        @component('components/logo', { width: '150', height: '28' })
+        @end
       @end
     </div>
     <div>

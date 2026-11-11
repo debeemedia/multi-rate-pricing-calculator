@@ -39,6 +39,14 @@ router
       .as('documents.finalize') // Finalize a document draft
 
     router
+      .get('documents/:id/export', [controllers.Documents, 'showExportForm'])
+      .as('documents.show_export_form') // View document PDF generation page
+
+    router
+      .post('documents/:id/export', [controllers.Documents, 'generatePdf'])
+      .as('documents.generate_pdf')
+
+    router
       .get('documents/reports/summary', [controllers.Documents, 'summaryReport'])
       .as('documents.summary_report')
 

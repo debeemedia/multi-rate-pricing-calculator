@@ -73,6 +73,7 @@
     "edge.js": "^6.5.1",
     "luxon": "^3.7.2",
     "pg": "^8.23.0",
+    "puppeteer": "^25.17.0",
     "reflect-metadata": "^0.2.2"
   },
   "hotHook": {

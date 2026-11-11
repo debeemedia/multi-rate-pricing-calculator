@@ -18,7 +18,7 @@
 
 html,
 body {
-  height: 100%;
+  height: 100vh;
   font-family: system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   background: var(--gray-2);
@@ -87,7 +87,7 @@ main {
 
 .hero {
   text-align: center;
-  padding: 60px 20px 20px;
+  padding: 32px 20px 16px;
   max-width: 800px;
   margin: 0 auto;
 }
@@ -116,7 +116,7 @@ main {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
-  padding: 40px 50px 60px; /* Top padding separates from hero, bottom padding adds breathing room */
+  padding: 24px 40px 32px;
   margin-top: 40px;
   border-top: 1px solid var(--gray-3);
 }
@@ -161,6 +161,46 @@ main {
   line-height: 1.5;
   font-size: 14px;
   margin: 0;
+}
+
+/* Footer */
+.app-footer {
+  margin-top: 24px;
+  border-top: 1px solid #f1f5f9;
+  padding: 20px 16px;
+}
+
+.footer-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.footer-dot {
+  color: #cbd5e1;
+}
+
+.dbm-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #94a3b8;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.dbm-link:hover {
+  color: #475569;
+}
+
+.dbm-icon {
+  width: 22px;
+  height: 8px;
+  display: inline-block;
+  transform: translateY(-1.5px); /* Nudges the icon up to match the text optical center */
 }
 
 /* Form */
@@ -790,6 +830,7 @@ select:focus {
 .tip-text {
   font-size: 13px;
   color: var(--gray-6);
+  text-align: center;
 }
 
 .button.success {
@@ -840,6 +881,63 @@ select:focus {
 
 /**
 end of show.edge styles
+ **/
+
+/**
+show_evport_form.edge styles
+
+(also uses show.edge styles)
+ **/
+
+.export-watermark-notice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  font-size: 12px;
+  color: #475569;
+}
+
+.notice-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.notice-icon {
+  color: #64748b;
+  flex-shrink: 0;
+}
+
+.notice-content strong {
+  color: #1e293b;
+  font-weight: 600;
+}
+
+.upgrade-btn-disabled {
+  background-color: #f1f5f9;
+  color: #94a3b8;
+  border: 1px solid #cbd5e1;
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: 4px;
+  cursor: not-allowed;
+  white-space: nowrap;
+}
+
+.action-buttons-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+/**
+end of show_evport_form.edge styles
  **/
 
 /**
@@ -1107,6 +1205,16 @@ end of summary_report.edge styles
     padding: 20px;
   }
 
+  /* Footer */
+  .footer-inner {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .footer-dot {
+    display: none; /* Hide the separator bullet on narrow screens */
+  }
+
   /* Form & Alerts */
   .form-container {
     margin: 80px auto 32px;
@@ -1180,6 +1288,36 @@ end of summary_report.edge styles
   }
   .ml-auto {
     margin-left: 0;
+  }
+  .disabled-action-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  /* show_export_form.edge styles */
+  .export-watermark-notice {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 14px;
+  }
+
+  .export-watermark-notice .upgrade-btn-disabled {
+    width: 100%;
+    text-align: center;
+    padding: 6px 12px;
+  }
+
+  .action-buttons-row {
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
+  }
+
+  .action-buttons-row .button {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
   }
 }
 

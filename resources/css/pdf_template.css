@@ -1,0 +1,252 @@
+/* Print & A4 Setup */
+@page {
+  /* Size and margin can be handled in the puppeteer setting */
+  /* size: A4; */
+  /* margin: 20mm;  */
+  @bottom-right {
+    content: 'Page ' counter(page) ' of ' counter(pages);
+    font-size: 10px;
+    color: #6b7280;
+    font-family: system-ui, sans-serif;
+  }
+}
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+body {
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+  color: #111827;
+  background-color: #ffffff;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* Header Layout */
+.invoice-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 32px;
+  margin-bottom: 32px;
+}
+.brand-section h1 {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: #111827;
+  margin-bottom: 4px;
+}
+.brand-section .tagline {
+  font-size: 13px;
+  color: #4b5563;
+  margin-bottom: 8px;
+}
+.brand-section .contact-info {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.invoice-meta {
+  text-align: right;
+}
+.invoice-meta h2 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.invoice-meta p {
+  font-size: 13px;
+  color: #4b5563;
+}
+.invoice-meta strong {
+  color: #111827;
+}
+
+/* Billing Section */
+.billing-section {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 36px;
+}
+.bill-to h3 {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #6b7280;
+  margin-bottom: 6px;
+}
+.bill-to .client-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 2px;
+}
+.bill-to .client-contact {
+  font-size: 13px;
+  color: #4b5563;
+}
+
+/* Line Items Table */
+.items-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 32px;
+}
+.items-table thead {
+  display: table-header-group; /* Repeats the <thead> on new pages */
+}
+.items-table th {
+  background-color: #f9fafb;
+  color: #374151;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: left;
+  padding: 10px 14px;
+  border-bottom: 1px solid #e5e7eb;
+}
+.items-table th.text-right,
+.items-table td.text-right {
+  text-align: right;
+}
+.items-table td {
+  padding: 14px;
+  font-size: 13px;
+  color: #1f2937;
+  border-bottom: 1px solid #f3f4f6;
+}
+.items-table td.item-name {
+  font-weight: 500;
+  color: #111827;
+}
+
+/* Line Item Transparency Meta-text */
+.item-meta-details {
+  margin-top: 4px;
+  font-size: 10px;
+  color: #64748b;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.item-meta-details span {
+  background-color: #f1f5f9;
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+/* Totals Summary */
+.totals-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 40px;
+}
+.totals-box {
+  width: 280px;
+}
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 13px;
+  color: #4b5563;
+}
+.total-row.grand-total {
+  border-top: 2px solid #111827;
+  margin-top: 8px;
+  padding-top: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #111827;
+}
+.totals-wrapper,
+.footer-info-container {
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+/* Payment & Notes Footer Box */
+.footer-info-container {
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  page-break-inside: avoid;
+}
+.payment-instructions h4,
+.notes-box h4 {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #374151;
+  margin-bottom: 6px;
+}
+.payment-instructions p,
+.notes-box p {
+  font-size: 12px;
+  color: #4b5563;
+  margin-bottom: 3px;
+}
+.payment-instructions strong {
+  color: #111827;
+}
+
+.payment-terms-text {
+  margin-top: 10px;
+}
+
+/* Container holding payment box + watermark together */
+.bottom-document-cluster {
+  margin-top: 32px;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+/* Final Document Watermark */
+.hivedocs-final-watermark {
+  margin-top: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 11px;
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.hivedocs-final-watermark span {
+  font-weight: 500;
+  color: #64748b;
+}
+
+.hivedocs-final-watermark svg {
+  color: #64748b;
+  vertical-align: middle;
+}

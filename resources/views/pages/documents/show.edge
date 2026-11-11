@@ -310,7 +310,7 @@
         // Initialize display state on load
         document.addEventListener('DOMContentLoaded', toggleDiscountInputs);
       </script>
-      {{-- Action Bar --}}
+      {{-- Action Bar (Draft State) --}}
       <div class="document-actions-bar">
         @if(document.documentLineItems.length)
           <form
@@ -321,10 +321,18 @@
             {{ csrfField() }}
             <button type="submit" class="button success">Finalize Document (Freeze)</button>
           </form>
+
+          <a
+            href="{{ route('documents.show_export_form', { id: document.id }) }}"
+            class="button secondary"
+          >
+            Export PDF
+          </a>
         @else
           <div class="disabled-action-group">
             <button type="button" class="button secondary" disabled>Finalize Document</button>
-            <span class="tip-text">Add at least one line item to finalize.</span>
+            <button type="button" class="button secondary" disabled>Export PDF</button>
+            <span class="tip-text">Add at least one line item to finalize or export.</span>
           </div>
         @end
 
@@ -344,8 +352,15 @@
         </form>
       </div>
     @else
+      {{-- Read-Only & Action Bar (Finalized State) --}}
       <div class="read-only-banner">
         <p>✔ This document is finalized and read-only. No further modifications can be made.</p>
+        <a
+          href="{{ route('documents.show_export_form', { id: document.id }) }}"
+          class="button primary mt-4"
+        >
+          Export PDF
+        </a>
       </div>
     @end
   </div>
