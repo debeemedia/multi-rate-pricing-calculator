@@ -76,9 +76,13 @@
     {{-- Active Date Scope Pill --}}
     <div class="report-context-bar">
       <span class="context-pill">
+        
         Showing metrics for
+
         <strong>finalized {{ filters.currencyCode }}</strong>
+        
          documents
+
 
         @if(filters.startDate && filters.endDate)
           with
@@ -111,21 +115,36 @@
       <div class="metric-card">
         <span class="metric-label">Total Discounts</span>
         <span class="metric-value font-mono">
-          -{{ filters.currencySymbol }}{{ Number(report.aggregateTotalDiscount || 0).toFixed(2) }}
+          -{{ filters.currencySymbol }}{{
+            Number(report.aggregateTotalDiscount || 0).toLocaleString(
+              'en-NG',
+              { minimumFractionDigits: 2, maximumFractionDigits: 2 },
+            )
+          }}
         </span>
       </div>
 
       <div class="metric-card">
         <span class="metric-label">Total Tax</span>
         <span class="metric-value font-mono">
-          {{ filters.currencySymbol }}{{ Number(report.aggregateTotalTax || 0).toFixed(2) }}
+          {{ filters.currencySymbol }}{{
+            Number(report.aggregateTotalTax || 0).toLocaleString('en-NG', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })
+          }}
         </span>
       </div>
 
       <div class="metric-card highlight">
         <span class="metric-label">Sum of Grand Totals</span>
         <span class="metric-value font-mono">
-          {{ filters.currencySymbol }}{{ Number(report.aggregateGrandTotal || 0).toFixed(2) }}
+          {{ filters.currencySymbol }}{{
+            Number(report.aggregateGrandTotal || 0).toLocaleString('en-NG', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })
+          }}
         </span>
       </div>
     </div>

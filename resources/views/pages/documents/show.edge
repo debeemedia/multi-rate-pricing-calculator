@@ -102,7 +102,12 @@
                   <td class="font-medium">{{ item.description }}</td>
                   <td class="text-center font-mono">{{ item.quantity }}</td>
                   <td class="text-right font-mono">
-                    {{ document.currency.symbol }}{{ Number(item.unitPrice).toFixed(2) }}
+                    {{ document.currency.symbol }}{{
+                      Number(item.unitPrice).toLocaleString('en-NG', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })
+                    }}
                   </td>
                   <td class="text-right font-mono">
                     @if(item.discountType === 'percent')
@@ -110,17 +115,32 @@
                       %
                     @elseif(item.discountType === 'fixed')
                       {{ document.currency.symbol }}
-                      {{ Number(item.discountValueFixed).toFixed(2) }}
+                      {{
+                        Number(item.discountValueFixed).toLocaleString(
+                          'en-NG',
+                          { minimumFractionDigits: 2, maximumFractionDigits: 2 },
+                        )
+                      }}
                     @else
                       None
                     @end
                   </td>
                   <td class="text-right font-mono">{{ item.taxPercent }}%</td>
                   <td class="text-right font-mono">
-                    {{ document.currency.symbol }}{{ Number(item.subtotal).toFixed(2) }}
+                    {{ document.currency.symbol }}{{
+                      Number(item.subtotal).toLocaleString('en-NG', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })
+                    }}
                   </td>
                   <td class="text-right font-mono font-medium">
-                    {{ document.currency.symbol }}{{ Number(item.lineTotal).toFixed(2) }}
+                    {{ document.currency.symbol }}{{
+                      Number(item.lineTotal).toLocaleString('en-NG', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })
+                    }}
                   </td>
                   @if(document.status === 'draft')
                     <td class="text-center">
@@ -150,19 +170,34 @@
             <div class="totals-row">
               <span>Subtotal</span>
               <span class="font-mono">
-                {{ document.currency.symbol }}{{ Number(document.subtotal).toFixed(2) }}
+                {{ document.currency.symbol }}{{
+                  Number(document.subtotal).toLocaleString('en-NG', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })
+                }}
               </span>
             </div>
             <div class="totals-row">
               <span>Total Discount</span>
               <span class="font-mono">
-                -{{ document.currency.symbol }}{{ Number(document.totalDiscount).toFixed(2) }}
+                -{{ document.currency.symbol }}{{
+                  Number(document.totalDiscount).toLocaleString('en-NG', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })
+                }}
               </span>
             </div>
             <div class="totals-row">
               <span>Total Tax</span>
               <span class="font-mono">
-                +{{ document.currency.symbol }}{{ Number(document.totalTax).toFixed(2) }}
+                +{{ document.currency.symbol }}{{
+                  Number(document.totalTax).toLocaleString('en-NG', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })
+                }}
               </span>
             </div>
             <div class="totals-row grand">
@@ -177,7 +212,12 @@
                 </button>
               </span>
               <span class="font-mono">
-                {{ document.currency.symbol }}{{ Number(document.grandTotal).toFixed(2) }}
+                {{ document.currency.symbol }}{{
+                  Number(document.grandTotal).toLocaleString('en-NG', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })
+                }}
               </span>
             </div>
           </div>

@@ -48,7 +48,12 @@
                   {{ doc.issueDate ? doc.issueDate.toFormat('yyyy-MM-dd') : '—' }}
                 </td>
                 <td class="text-right font-mono">
-                  {{ doc.currency.symbol }}{{ Number(doc.grandTotal).toFixed(2) }}
+                  {{ doc.currency.symbol }}{{
+                    Number(doc.grandTotal).toLocaleString('en-NG', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })
+                  }}
                 </td>
                 <td class="text-center">
                   <a href="{{ route('documents.show', { id: doc.id }) }}">View</a>

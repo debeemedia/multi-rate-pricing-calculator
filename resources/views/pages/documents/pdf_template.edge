@@ -61,13 +61,23 @@
                 <div class="item-meta-details">
                   <span>
                     Subtotal:
-                    {{ document.currency.symbol }}{{ Number(item.subtotal).toFixed(2) }}
+                    {{ document.currency.symbol }}{{
+                      Number(item.subtotal).toLocaleString('en-NG', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })
+                    }}
                   </span>
                   @if(item.discountType === 'percent')
                     <span class="meta-tag">Discount: -{{ item.discountValuePercent }}%</span>
                   @elseif(item.discountType === 'fixed')
                     <span class="meta-tag">
-                      Discount: -{{ document.currency.symbol }}{{ Number(item.discountValueFixed).toFixed(2) }}
+                      Discount: -{{ document.currency.symbol }}{{
+                        Number(item.discountValueFixed).toLocaleString(
+                          'en-NG',
+                          { minimumFractionDigits: 2, maximumFractionDigits: 2 },
+                        )
+                      }}
                     </span>
                   @end
                   @if(Number(item.taxPercent) > 0)
@@ -78,10 +88,20 @@
             </td>
             <td class="text-right">{{ item.quantity }}</td>
             <td class="text-right">
-              {{ document.currency.symbol }}{{ Number(item.unitPrice).toFixed(2) }}
+              {{ document.currency.symbol }}{{
+                Number(item.unitPrice).toLocaleString('en-NG', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })
+              }}
             </td>
             <td class="text-right font-medium">
-              {{ document.currency.symbol }}{{ Number(item.lineTotal).toFixed(2) }}
+              {{ document.currency.symbol }}{{
+                Number(item.lineTotal).toLocaleString('en-NG', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })
+              }}
             </td>
           </tr>
         @end
@@ -92,26 +112,52 @@
       <div class="totals-box">
         <div class="total-row">
           <span>Subtotal</span>
-          <span>{{ document.currency.symbol }}{{ Number(document.subtotal).toFixed(2) }}</span>
+          <span>
+            {{ document.currency.symbol }}{{
+              Number(document.subtotal).toLocaleString('en-NG', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })
+            }}
+          </span>
         </div>
         @if(Number(document.totalDiscount) > 0)
           <div class="total-row discount">
             <span>Total Discount</span>
             <span>
-              -{{ document.currency.symbol }}{{ Number(document.totalDiscount).toFixed(2) }}
+              -{{ document.currency.symbol }}{{
+                Number(document.totalDiscount).toLocaleString('en-NG', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })
+              }}
             </span>
           </div>
         @end
         @if(Number(document.totalTax) > 0)
           <div class="total-row tax">
             <span>Total Tax</span>
-            <span>+{{ document.currency.symbol }}{{ Number(document.totalTax).toFixed(2) }}</span>
+            <span>
+              +{{ document.currency.symbol }}{{
+                Number(document.totalTax).toLocaleString('en-NG', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })
+              }}
+            </span>
           </div>
         @end
 
         <div class="total-row grand-total">
           <span>Grand Total</span>
-          <span>{{ document.currency.symbol }}{{ Number(document.grandTotal).toFixed(2) }}</span>
+          <span>
+            {{ document.currency.symbol }}{{
+              Number(document.grandTotal).toLocaleString('en-NG', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })
+            }}
+          </span>
         </div>
       </div>
     </div>
