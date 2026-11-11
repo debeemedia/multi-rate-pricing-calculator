@@ -11,11 +11,10 @@ import { CalculationError } from '#services/pricing_calculator_service'
 import { DocumentStatusesEnum } from '#types/index'
 import { inject } from '@adonisjs/core'
 import { isJsonRequest } from '#helpers/http_helper'
-import { DateTime } from 'luxon'
 import puppeteer from 'puppeteer'
 import app from '@adonisjs/core/services/app'
 import fs from 'node:fs/promises'
-import Currency from '#models/currency'
+import Currency, { defaultCurrencyCode } from '#models/currency'
 
 @inject()
 export default class DocumentsController {
@@ -44,10 +43,7 @@ export default class DocumentsController {
    * `GET /documents/create`
    */
   async create({ view }: HttpContext) {
-    const supportedCurrencies = await Currency.query()
-      .select(['code', 'name', 'symbol'])
-      .where('is_supported', true)
-      .orderBy('code', 'asc')
+    const supportedCurrencies = await returnSupportedCurrencies()
 
     return view.render('pages/documents/create', { supportedCurrencies })
   }
@@ -287,10 +283,25 @@ export default class DocumentsController {
   public async summaryReport({ request, response, auth, view, session }: HttpContext) {
     const payload = await request.validateUsing(summaryReportValidator)
 
-    const startDate = payload.startDate ?? DateTime.now().setZone('utc').startOf('month')
-    const endDate = payload.endDate ?? DateTime.now().setZone('utc').endOf('day')
+    const supportedCurrencies = await returnSupportedCurrencies()
 
-    if (endDate < startDate) {
+    const currencyCode = payload.currencyCode ?? defaultCurrencyCode
+    const currencySymbol = supportedCurrencies.find(
+      (currency) => currency.code === currencyCode
+    )!.symbol
+
+    const viewData = {
+      supportedCurrencies,
+      defaultCurrencyCode,
+      filters: {
+        startDate: payload.startDate ? payload.startDate.toISODate() : '',
+        endDate: payload.endDate ? payload.endDate.toISODate() : '',
+        currencyCode,
+        currencySymbol,
+      },
+    }
+
+    if (payload.endDate && payload.startDate && payload.endDate < payload.startDate) {
       const errorMessage = 'End date cannot be earlier than start date.'
 
       if (isJsonRequest(request)) {
@@ -310,17 +321,19 @@ export default class DocumentsController {
           aggregateTotalTax: 0,
           aggregateGrandTotal: 0,
         },
-        filters: {
-          startDate: payload.startDate ? payload.startDate.toISODate() : '',
-          endDate: payload.endDate ? payload.endDate.toISODate() : '',
-        },
+        ...viewData,
       })
     }
 
     // Clear lingering error flash messages on success
     session.flashMessages.clear()
 
-    const report = await this.documentService.getSummaryReport(auth.user!.id, startDate, endDate)
+    const report = await this.documentService.getSummaryReport({
+      userId: auth.user!.id,
+      currencyCode,
+      startDate: payload.startDate,
+      endDate: payload.endDate,
+    })
 
     if (isJsonRequest(request)) {
       return response.ok({ data: report })
@@ -329,10 +342,14 @@ export default class DocumentsController {
     return view.render('pages/documents/summary_report', {
       errorMessage: null, // Clear explicit error state report,
       report,
-      filters: {
-        startDate: startDate.toISODate(),
-        endDate: endDate.toISODate(),
-      },
+      ...viewData,
     })
   }
+}
+
+export async function returnSupportedCurrencies() {
+  return await Currency.query()
+    .select(['code', 'name', 'symbol'])
+    .where('is_supported', true)
+    .orderBy('code', 'asc')
 }

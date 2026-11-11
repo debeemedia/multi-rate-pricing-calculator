@@ -1,4 +1,4 @@
-import Currency, { SUPPORTED_CURRENCIES } from '#models/currency'
+import Currency, { SUPPORTED_CURRENCY_CODES } from '#models/currency'
 import { BaseSeeder } from '@adonisjs/lucid/seeders'
 import currenciesData from '../data/currencies_symbols.json' with { type: 'json' }
 
@@ -11,7 +11,7 @@ export default class extends BaseSeeder {
         name: currency.name,
         symbol: currency.symbol,
         decimalDigits: currency.decimal_digits,
-        isSupported: (SUPPORTED_CURRENCIES as unknown as string[]).includes(currency.iso_code),
+        isSupported: (SUPPORTED_CURRENCY_CODES as unknown as string[]).includes(currency.iso_code),
       }))
     )
   }

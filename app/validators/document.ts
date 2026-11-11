@@ -1,4 +1,4 @@
-import { SUPPORTED_CURRENCIES } from '#models/currency'
+import { SUPPORTED_CURRENCY_CODES } from '#models/currency'
 import { discountTypes, DiscountTypesEnum } from '#types/index'
 import vine from '@vinejs/vine'
 import { DateTime } from 'luxon'
@@ -145,7 +145,7 @@ const customerNameSchema = vine.string().trim().use(stripTags()).trim().minLengt
 const issueDateSchema = vine
   .string()
   .transform((value) => DateTime.fromISO(value, { zone: 'utc' }).startOf('day'))
-const currencyCodeSchema = vine.enum(SUPPORTED_CURRENCIES).use(stripTags())
+const currencyCodeSchema = vine.enum(SUPPORTED_CURRENCY_CODES).use(stripTags())
 
 /**
  * Validator for Document creation (with optional inline line items)
@@ -203,11 +203,14 @@ export const summaryReportValidator = vine.create(
   vine.object({
     startDate: vine
       .string()
-      .transform((val) => DateTime.fromISO(val, { zone: 'utc' }).startOf('day'))
-      .optional(),
+      .optional()
+      .transform((val) =>
+        val ? DateTime.fromISO(val, { zone: 'utc' }).startOf('day') : undefined
+      ),
     endDate: vine
       .string()
-      .transform((val) => DateTime.fromISO(val, { zone: 'utc' }).endOf('day'))
-      .optional(),
+      .optional()
+      .transform((val) => (val ? DateTime.fromISO(val, { zone: 'utc' }).endOf('day') : undefined)),
+    currencyCode: currencyCodeSchema.optional(),
   })
 )
