@@ -214,7 +214,15 @@ CREATE DATABASE multi_rate_pricing_calculator;
 node ace migration:run
 ```
 
-**6. Run the Application:**
+**6. Run Seeders:**
+
+```bash
+node ace db:seed
+```
+
+This will seed the database with data needed for the application to run e.g. currencies.
+
+**7. Run the Application:**
 
 ```bash
 npm run dev
