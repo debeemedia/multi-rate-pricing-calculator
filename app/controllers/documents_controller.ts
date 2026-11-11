@@ -15,6 +15,7 @@ import { DateTime } from 'luxon'
 import puppeteer from 'puppeteer'
 import app from '@adonisjs/core/services/app'
 import fs from 'node:fs/promises'
+import Currency from '#models/currency'
 
 @inject()
 export default class DocumentsController {
@@ -26,7 +27,9 @@ export default class DocumentsController {
    */
   public async index({ auth, request, response, view }: HttpContext) {
     const user = auth.user!
-    const documents = await Document.query().where({ userId: user.id }).orderBy('issueDate', 'desc')
+    const documents = await DocumentService.preloadCurrencyRelation(
+      Document.query().where({ userId: user.id })
+    ).orderBy('issueDate', 'desc')
 
     if (isJsonRequest(request)) {
       return response.ok({ data: documents })
@@ -41,7 +44,12 @@ export default class DocumentsController {
    * `GET /documents/create`
    */
   async create({ view }: HttpContext) {
-    return view.render('pages/documents/create')
+    const supportedCurrencies = await Currency.query()
+      .select(['code', 'name', 'symbol'])
+      .where('is_supported', true)
+      .orderBy('code', 'asc')
+
+    return view.render('pages/documents/create', { supportedCurrencies })
   }
 
   /**
@@ -87,8 +95,9 @@ export default class DocumentsController {
    * `GET /documents/:id`
    */
   public async show({ params, auth, request, response, view }: HttpContext) {
-    const document = await Document.query()
-      .where({ id: params.id, userId: auth.user!.id })
+    const document = await DocumentService.preloadCurrencyRelation(
+      Document.query().where({ id: params.id, userId: auth.user!.id })
+    )
       .preload('documentLineItems')
       .firstOrFail()
 
@@ -217,8 +226,9 @@ export default class DocumentsController {
   public async generatePdf({ params, request, auth, response, view }: HttpContext) {
     const payload = await request.validateUsing(generatePdfValidator)
 
-    const document = await Document.query()
-      .where({ id: params.id, userId: auth.user!.id })
+    const document = await DocumentService.preloadCurrencyRelation(
+      Document.query().where({ id: params.id, userId: auth.user!.id })
+    )
       .preload('documentLineItems')
       .firstOrFail()
 

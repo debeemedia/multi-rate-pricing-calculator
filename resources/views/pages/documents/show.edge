@@ -101,22 +101,26 @@
                 <tr>
                   <td class="font-medium">{{ item.description }}</td>
                   <td class="text-center font-mono">{{ item.quantity }}</td>
-                  <td class="text-right font-mono">${{ Number(item.unitPrice).toFixed(2) }}</td>
+                  <td class="text-right font-mono">
+                    {{ document.currency.symbol }}{{ Number(item.unitPrice).toFixed(2) }}
+                  </td>
                   <td class="text-right font-mono">
                     @if(item.discountType === 'percent')
                       {{ item.discountValuePercent }}
                       %
                     @elseif(item.discountType === 'fixed')
-                      $
+                      {{ document.currency.symbol }}
                       {{ Number(item.discountValueFixed).toFixed(2) }}
                     @else
                       None
                     @end
                   </td>
                   <td class="text-right font-mono">{{ item.taxPercent }}%</td>
-                  <td class="text-right font-mono">${{ Number(item.subtotal).toFixed(2) }}</td>
+                  <td class="text-right font-mono">
+                    {{ document.currency.symbol }}{{ Number(item.subtotal).toFixed(2) }}
+                  </td>
                   <td class="text-right font-mono font-medium">
-                    ${{ Number(item.lineTotal).toFixed(2) }}
+                    {{ document.currency.symbol }}{{ Number(item.lineTotal).toFixed(2) }}
                   </td>
                   @if(document.status === 'draft')
                     <td class="text-center">
@@ -145,15 +149,21 @@
           <div class="totals-box">
             <div class="totals-row">
               <span>Subtotal</span>
-              <span class="font-mono">${{ Number(document.subtotal).toFixed(2) }}</span>
+              <span class="font-mono">
+                {{ document.currency.symbol }}{{ Number(document.subtotal).toFixed(2) }}
+              </span>
             </div>
             <div class="totals-row">
               <span>Total Discount</span>
-              <span class="font-mono">-${{ Number(document.totalDiscount).toFixed(2) }}</span>
+              <span class="font-mono">
+                -{{ document.currency.symbol }}{{ Number(document.totalDiscount).toFixed(2) }}
+              </span>
             </div>
             <div class="totals-row">
               <span>Total Tax</span>
-              <span class="font-mono">+${{ Number(document.totalTax).toFixed(2) }}</span>
+              <span class="font-mono">
+                +{{ document.currency.symbol }}{{ Number(document.totalTax).toFixed(2) }}
+              </span>
             </div>
             <div class="totals-row grand">
               <span class="tooltip-wrapper">
@@ -166,7 +176,9 @@
                   </span>
                 </button>
               </span>
-              <span class="font-mono">${{ Number(document.grandTotal).toFixed(2) }}</span>
+              <span class="font-mono">
+                {{ document.currency.symbol }}{{ Number(document.grandTotal).toFixed(2) }}
+              </span>
             </div>
           </div>
         </div>
@@ -212,7 +224,7 @@
             </div>
 
             <div class="grid-field">
-              <label for="item-unit-price">Unit Price ($)</label>
+              <label for="item-unit-price">Unit Price ({{ document.currency.symbol }})</label>
               <input
                 type="number"
                 id="item-unit-price"
@@ -234,7 +246,7 @@
                   No Discount
                 </option>
                 <option value="fixed" {{ old('discountType') === 'fixed' ? 'selected' : '' }}>
-                  Fixed ($)
+                  Fixed ({{ document.currency.symbol }})
                 </option>
                 <option value="percent" {{ old('discountType') === 'percent' ? 'selected' : '' }}>
                   Percent (%)
@@ -243,7 +255,7 @@
             </div>
 
             <div class="grid-field" id="discount-fixed-container">
-              <label for="item-discount-fixed">Discount ($)</label>
+              <label for="item-discount-fixed">Discount ({{ document.currency.symbol }})</label>
               <input
                 type="number"
                 id="item-discount-fixed"

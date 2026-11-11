@@ -5,6 +5,8 @@ import { PricingCalculator } from '#services/pricing_calculator_service'
 import { DiscountType, DiscountTypesEnum, DocumentStatusesEnum, LineItemInput } from '#types/index'
 import { DateTime } from 'luxon'
 import { TransactionClientContract } from '@adonisjs/lucid/types/database'
+import { ModelQueryBuilderContract } from '@adonisjs/lucid/types/model'
+import { SUPPORTED_CURRENCIES } from '#models/currency'
 
 export class DocumentError extends Error {
   public status: number
@@ -27,9 +29,10 @@ export default class DocumentService {
       customerName: string
       issueDate: DateTime
       lineItems?: LineItemInput[]
+      currencyCode: (typeof SUPPORTED_CURRENCIES)[number]
     }
   ) {
-    const { customerName, issueDate, title, lineItems } = data
+    const { customerName, issueDate, title, lineItems, currencyCode } = data
     return await db.transaction(async (trx) => {
       // 1. Create base document draft
       const document = await Document.create(
@@ -39,6 +42,7 @@ export default class DocumentService {
           customerName,
           issueDate,
           status: DocumentStatusesEnum.Draft,
+          currencyCode,
         },
         { client: trx }
       )
@@ -296,5 +300,11 @@ export default class DocumentService {
       aggregateTotalTax: PricingCalculator.toMainUnit(Number(result.aggregate_total_tax)),
       aggregateGrandTotal: PricingCalculator.toMainUnit(Number(result.aggregate_grand_total)),
     }
+  }
+
+  public static preloadCurrencyRelation(query: ModelQueryBuilderContract<typeof Document>) {
+    return query.preload('currency', (currencyQuery) => {
+      currencyQuery.select(['code', 'symbol'])
+    })
   }
 }

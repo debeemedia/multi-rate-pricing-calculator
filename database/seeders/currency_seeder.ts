@@ -11,7 +11,7 @@ export default class extends BaseSeeder {
         name: currency.name,
         symbol: currency.symbol,
         decimalDigits: currency.decimal_digits,
-        isSupported: SUPPORTED_CURRENCIES.includes(currency.iso_code),
+        isSupported: (SUPPORTED_CURRENCIES as unknown as string[]).includes(currency.iso_code),
       }))
     )
   }

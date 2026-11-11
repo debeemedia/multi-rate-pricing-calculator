@@ -1,3 +1,4 @@
+import { SUPPORTED_CURRENCIES } from '#models/currency'
 import { discountTypes, DiscountTypesEnum } from '#types/index'
 import vine from '@vinejs/vine'
 import { DateTime } from 'luxon'
@@ -144,6 +145,7 @@ const customerNameSchema = vine.string().trim().use(stripTags()).trim().minLengt
 const issueDateSchema = vine
   .string()
   .transform((value) => DateTime.fromISO(value, { zone: 'utc' }).startOf('day'))
+const currencyCodeSchema = vine.enum(SUPPORTED_CURRENCIES).use(stripTags())
 
 /**
  * Validator for Document creation (with optional inline line items)
@@ -154,6 +156,7 @@ export const createDocumentValidator = vine.create(
     customerName: customerNameSchema,
     issueDate: issueDateSchema,
     lineItems: vine.array(documentLineItemSchema).optional(), // Optional during creation so UI can create a bare document draft first
+    currencyCode: currencyCodeSchema,
   })
 )
 
@@ -174,17 +177,17 @@ export const updateDocumentValidator = vine.create(
  */
 export const generatePdfValidator = vine.create(
   vine.object({
-    customerName: vine.string().trim().minLength(1),
-    customerContact: vine.string().trim().optional(),
-    businessName: vine.string().trim().minLength(1),
-    businessTagline: vine.string().trim().optional(),
-    businessContact: vine.string().trim().minLength(1),
-    bankName: vine.string().trim().minLength(1),
-    accountName: vine.string().trim().minLength(1),
-    accountNumber: vine.string().trim().minLength(1),
+    customerName: vine.string().trim().use(stripTags()).trim().minLength(1),
+    customerContact: vine.string().trim().use(stripTags()).trim().optional(),
+    businessName: vine.string().trim().use(stripTags()).trim().minLength(1),
+    businessTagline: vine.string().trim().use(stripTags()).trim().optional(),
+    businessContact: vine.string().trim().use(stripTags()).trim().minLength(1),
+    bankName: vine.string().trim().use(stripTags()).trim().minLength(1),
+    accountName: vine.string().trim().use(stripTags()).trim().minLength(1),
+    accountNumber: vine.string().trim().use(stripTags()).trim().minLength(1),
     paymentReference: vine.string().maxLength(20).optional(),
-    paymentTerms: vine.string().trim().minLength(1),
-    notes: vine.string().trim().optional(),
+    paymentTerms: vine.string().trim().use(stripTags()).trim().minLength(1),
+    notes: vine.string().trim().use(stripTags()).trim().optional(),
   })
 )
 

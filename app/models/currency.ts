@@ -2,4 +2,4 @@ import { CurrencySchema } from '#database/schema'
 
 export default class Currency extends CurrencySchema {}
 
-export const SUPPORTED_CURRENCIES: string[] = ['USD', 'NGN']
+export const SUPPORTED_CURRENCIES = ['USD', 'NGN'] as const
