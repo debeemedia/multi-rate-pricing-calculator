@@ -31,6 +31,8 @@ export default class extends BaseSchema {
 
       // Compound index covers user filtering, status filtering, and date range queries
       table.index(['user_id', 'status', 'issue_date'])
+
+      // NB: In a later migration, this has been expanded to include 'currency_code'
     })
   }
 
