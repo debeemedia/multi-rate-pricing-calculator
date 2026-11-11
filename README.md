@@ -1,6 +1,6 @@
 # Multi-Rate Pricing Calculator
 
-A web application built with AdonisJS v7, TypeScript, and PostgreSQL that lets users manage documents, compute multi-rate line-item discounts and taxes server-side, maintain strict lifecycle immutability for finalized documents, and generate summary reports.
+A web application built with AdonisJS v7, TypeScript, and PostgreSQL that lets users manage documents, compute multi-rate line-item discounts and taxes server-side, maintain strict lifecycle immutability for finalized documents, generate summary reports for different ranges, and print document invoice PDFs.
 
 ## Live Demo & Repository
 
@@ -18,8 +18,9 @@ Repository: [https://github.com/debeemedia/multi-rate-pricing-calculator](https:
 ## Features Implemented
 
 - **Auth & Data Isolation:** Multi-tenant isolation ensuring users can only view, edit, or report on their own documents.
-- **Server-Side Financial Engine:** Integer-based cent representation avoiding JavaScript IEEE 754 floating-point drift.
+- **Server-Side Financial Engine:** Integer-based minor unit (e.g cent) representation avoiding JavaScript IEEE 754 floating-point drift.
 - **Strict Document Lifecycle:** Draft documents are fully editable; finalized documents become immutable across both UI and API levels.
+- **Document Invoice PDF Generation:** Combines documents and line items data, with allowance for user input of additional data e.g payment terms, bank details etc. via a form; generates an invoice PDF for download.
 - **Date-Bounded Summary Reporting:** Aggregates metrics (Total Documents, Revenue, Discounts, Tax) across customizable date ranges, with composite index on relevant columns (`user_id, issue_date, status`) for fast lookups.
 - **Responsive & Intuitive UI:** Modern, mobile-first CSS architecture featuring adaptive grid systems, seamless media query breakpoints, and clear visual navigation across all viewport sizes.
 - **System Health Monitoring:** Exposes a lightweight `GET /health` endpoint for server uptime and database connectivity checks.
@@ -98,6 +99,7 @@ Below is the test case executed by our test suite (`tests/unit/pricing_calculato
 - **`finalized` State:**
   - Immutability is enforced at the service/API layer, returning a `400 Bad Request` if `PUT/PATCH/DELETE` requests hit a finalized resource.
   - Line-item addition and deletion endpoints reject writes on finalized documents.
+  - PDF generation is possible for both draft and finalized documents, mimicking real-world situations where negotiations take place and revised invoices are sent to clients.
 
 > **Document Duplication:** Document duplication (cloning a finalized document into a new draft) is currently **not supported**. All documents must be created directly or edited while in `draft` status.
 
@@ -296,6 +298,7 @@ The base URL for all API requests is: `https://multi-rate-pricing-calculator-pp8
 | `PUT`    | `/documents/:id`          | Update document details (`title`, `customerName`, `issueDate`)             |
 | `PATCH`  | `/documents/:id/finalize` | Mark document `status` as `finalized`. Cannot be modified or deleted after |
 | `DELETE` | `/documents/:id`          | Delete a document and its associated line items                            |
+| `POST`   | `/documents/:id/export`   | Generate and Download Document PDF                                         |
 
 ---
 
@@ -482,7 +485,7 @@ node ace test unit
 
 **4. Asynchronous Export Generation:**
 
-- Implement asynchronous background worker (e.g. BullMQ) for generating downloadable PDF invoices sent via email or direct download links.
+- Generation of downloadable PDF invoices is currently supported; move this into an asynchronous background worker (e.g. BullMQ).
 
 **5. Structured Logging & Application Observability:**
 
