@@ -18,7 +18,7 @@
 
 html,
 body {
-  height: 100%;
+  height: 100vh;
   font-family: system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   background: var(--gray-2);
@@ -87,7 +87,7 @@ main {
 
 .hero {
   text-align: center;
-  padding: 60px 20px 20px;
+  padding: 32px 20px 16px;
   max-width: 800px;
   margin: 0 auto;
 }
@@ -116,7 +116,7 @@ main {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
-  padding: 40px 50px 60px; /* Top padding separates from hero, bottom padding adds breathing room */
+  padding: 24px 40px 32px;
   margin-top: 40px;
   border-top: 1px solid var(--gray-3);
 }
@@ -165,7 +165,7 @@ main {
 
 /* Footer */
 .app-footer {
-  margin-top: 64px;
+  margin-top: 24px;
   border-top: 1px solid #f1f5f9;
   padding: 20px 16px;
 }
