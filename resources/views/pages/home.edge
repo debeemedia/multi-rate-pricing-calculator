@@ -1,8 +1,8 @@
 @layout()
   <div class="hero">
-    <h1>Precision document & multi-rate pricing engine</h1>
+    <h1>Your Invoices & Documents</h1>
     <p>
-      Create accurate invoices, quotes, and bills with line-item discounts, custom tax rates, and zero rounding errors.
+      Create, manage, and export professional invoices, quotes, and bills with line-item discounts, custom tax rates, and zero rounding errors.
     </p>
     {{-- Main Action Button --}}
     <div style="margin-top: 1.5rem;">
@@ -14,18 +14,18 @@
     {{-- Card 1: Clickable link to Documents --}}
     <a href="{{ route('documents.index') }}" class="card-link">
       <div class="card">
-        <h3>Exact Math Engine &nbsp;›</h3>
+        <h3>Multi-Rate Discounts & Tax &nbsp;›</h3>
         <p>
-          Integer-based pricing engine powered by integer cents eliminates floating-point rounding bugs.
+          Apply fixed amounts or percentage discounts per line item with precise subtotal breakdowns. Zero floating-point rounding bugs.
         </p>
       </div>
     </a>
     {{-- Card 2: Clickable link to Documents --}}
     <a href="{{ route('documents.index') }}" class="card-link">
       <div class="card">
-        <h3>Multi-Rate Discounts & Tax &nbsp;›</h3>
+        <h3>Instant PDF Export &nbsp;›</h3>
         <p>
-          Apply fixed amounts or percentage discounts per line item with precise subtotal breakdowns.
+          Generate crisp, professional PDF invoices complete with your business branding, banking details, and itemized breakdowns instantly.
         </p>
       </div>
     </a>
@@ -37,4 +37,35 @@
       </div>
     </a>
   </div>
+
+  <footer class="app-footer">
+    <div class="footer-inner">
+      <span class="copyright-text">© {{ new Date().getFullYear() }} Hivedocs</span>
+      <span class="footer-dot">•</span>
+      <a
+        href="https://youtube.com/@debeemedia"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="dbm-link"
+      >
+        <span>Powered by deBee Media</span>
+        <svg class="dbm-icon" viewBox="0 0 288 100" fill="currentColor">
+          <path
+            id="D"
+            fill-rule="evenodd"
+            d="M0 0H18A50 50 0 0 1 18 100H0ZM17 17V83H18A33 33 0 0 0 18 17Z"
+          />
+          <path
+            id="B-play"
+            fill-rule="evenodd"
+            d="M66 0H144V100H66Z M83 17H124.7L101.6 50L124.7 83H83Z M126 50L144 21V79Z"
+          />
+          <path id="M-stem" fill-rule="nonzero" d="M144 0H162V100H144Z" />
+          <path id="M-diag" fill-rule="nonzero" d="M144 0H170L221 100H194Z" />
+          <path id="M-left" fill-rule="nonzero" d="M212 0H236L221 100H194Z" />
+          <path id="M-right" fill-rule="nonzero" d="M214 0H238L288 100H262Z" />
+        </svg>
+      </a>
+    </div>
+  </footer>
 @end

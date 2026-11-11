@@ -163,6 +163,46 @@ main {
   margin: 0;
 }
 
+/* Footer */
+.app-footer {
+  margin-top: 64px;
+  border-top: 1px solid #f1f5f9;
+  padding: 20px 16px;
+}
+
+.footer-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.footer-dot {
+  color: #cbd5e1;
+}
+
+.dbm-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #94a3b8;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.dbm-link:hover {
+  color: #475569;
+}
+
+.dbm-icon {
+  width: 22px;
+  height: 8px;
+  display: inline-block;
+  transform: translateY(-1.5px); /* Nudges the icon up to match the text optical center */
+}
+
 /* Form */
 .form-container {
   display: flex;
@@ -1163,6 +1203,16 @@ end of summary_report.edge styles
   }
   .card {
     padding: 20px;
+  }
+
+  /* Footer */
+  .footer-inner {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .footer-dot {
+    display: none; /* Hide the separator bullet on narrow screens */
   }
 
   /* Form & Alerts */
