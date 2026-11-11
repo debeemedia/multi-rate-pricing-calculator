@@ -170,6 +170,25 @@ export const updateDocumentValidator = vine.create(
 )
 
 /**
+ * Validator for generating / exporting document PDF
+ */
+export const generatePdfValidator = vine.create(
+  vine.object({
+    customerName: vine.string().trim().minLength(1),
+    customerContact: vine.string().trim().optional(),
+    businessName: vine.string().trim().minLength(1),
+    businessTagline: vine.string().trim().optional(),
+    businessContact: vine.string().trim().minLength(1),
+    bankName: vine.string().trim().minLength(1),
+    accountName: vine.string().trim().minLength(1),
+    accountNumber: vine.string().trim().minLength(1),
+    paymentReference: vine.string().maxLength(20).optional(),
+    paymentTerms: vine.string().trim().minLength(1),
+    notes: vine.string().trim().optional(),
+  })
+)
+
+/**
  * Validator for creating a line item for a document
  */
 export const createDocumentLineItemValidator = vine.create(documentLineItemSchema)

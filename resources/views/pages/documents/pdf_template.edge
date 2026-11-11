@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>{{ document.title }} - Invoice</title>
+    {{{ pdfTemplateStyles }}}
+  </head>
+  <body>
+    {{-- Header --}}
+    <div class="invoice-header">
+      <div class="brand-section">
+        <h1>{{ payload.businessName }}</h1>
+        @if(payload.businessTagline)
+          <p class="tagline">{{ payload.businessTagline }}</p>
+        @end
+
+        <p class="contact-info">{{ payload.businessContact }}</p>
+      </div>
+      <div class="invoice-meta">
+        <h2>Invoice</h2>
+        <p><strong>Title:</strong> {{ document.title }}</p>
+        <p>
+          <strong>Issue Date:</strong>
+          {{
+            new Date(document.issueDate).toLocaleDateString('en-NG', {
+              day: 'numeric',
+              month: 'short',
+              year: 'numeric',
+            })
+          }}
+        </p>
+      </div>
+    </div>
+    {{-- Billing Details --}}
+    <div class="billing-section">
+      <div class="bill-to">
+        <h3>Billed To:</h3>
+        <div class="client-name">{{ payload.customerName }}</div>
+        @if(payload.customerContact)
+          <div class="client-contact">{{ payload.customerContact }}</div>
+        @end
+      </div>
+    </div>
+    {{-- Line Items Table --}}
+    <table class="items-table">
+      <thead>
+        <tr>
+          <th>Description</th>
+          <th class="text-right">Qty</th>
+          <th class="text-right">Unit Price</th>
+          <th class="text-right">Line Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        @each(item in document.documentLineItems)
+          <tr>
+            <td class="item-name">
+              <div class="font-medium">{{ item.description }}</div>
+              {{-- Transparent breakdown meta-text for discounts & taxes --}}
+              @if(item.discountType !== 'none' || Number(item.taxPercent) > 0)
+                <div class="item-meta-details">
+                  <span>Subtotal: ${{ Number(item.subtotal).toFixed(2) }}</span>
+                  @if(item.discountType === 'percent')
+                    <span class="meta-tag">Discount: -{{ item.discountValuePercent }}%</span>
+                  @elseif(item.discountType === 'fixed')
+                    <span class="meta-tag">
+                      Discount: -${{ Number(item.discountValueFixed).toFixed(2) }}
+                    </span>
+                  @end
+                  @if(Number(item.taxPercent) > 0)
+                    <span class="meta-tag">Tax: +{{ item.taxPercent }}%</span>
+                  @end
+                </div>
+              @end
+            </td>
+            <td class="text-right">{{ item.quantity }}</td>
+            <td class="text-right">${{ Number(item.unitPrice).toFixed(2) }}</td>
+            <td class="text-right font-medium">${{ Number(item.lineTotal).toFixed(2) }}</td>
+          </tr>
+        @end
+      </tbody>
+    </table>
+    {{-- Totals Summary --}}
+    <div class="totals-wrapper">
+      <div class="totals-box">
+        <div class="total-row">
+          <span>Subtotal</span>
+          <span>${{ Number(document.subtotal).toFixed(2) }}</span>
+        </div>
+        @if(Number(document.totalDiscount) > 0)
+          <div class="total-row discount">
+            <span>Total Discount</span>
+            <span>-${{ Number(document.totalDiscount).toFixed(2) }}</span>
+          </div>
+        @end
+        @if(Number(document.totalTax) > 0)
+          <div class="total-row tax">
+            <span>Total Tax</span>
+            <span>+${{ Number(document.totalTax).toFixed(2) }}</span>
+          </div>
+        @end
+
+        <div class="total-row grand-total">
+          <span>Grand Total</span>
+          <span>${{ Number(document.grandTotal).toFixed(2) }}</span>
+        </div>
+      </div>
+    </div>
+    {{-- Group Payment Info and Watermark Together to prevent ghost second pages --}}
+    <div class="bottom-document-cluster">
+      <div class="footer-info-container">
+        <div class="payment-instructions">
+          <h4>Payment Instructions</h4>
+          <p><strong>Bank:</strong> {{ payload.bankName }}</p>
+          <p><strong>Account Name:</strong> {{ payload.accountName }}</p>
+          <p><strong>Account Number:</strong> {{ payload.accountNumber }}</p>
+          @if(payload.paymentReference)
+            <p><strong>Payment Reference:</strong> {{ payload.paymentReference }}</p>
+          @end
+
+          <p class="payment-terms-text">
+            <strong>Payment Terms:</strong>
+            {{ payload.paymentTerms }}
+          </p>
+        </div>
+        @if(payload.notes)
+          <div class="notes-box">
+            <h4>Notes / Remarks</h4>
+            <p>{{ payload.notes }}</p>
+          </div>
+        @end
+      </div>
+      {{-- Final Document Watermark --}}
+      <div class="hivedocs-final-watermark">
+        <span>Generated via</span>
+        @component('components/logo', { width: '110', height: '20' })
+        @end
+      </div>
+    </div>
+  </body>
+</html>

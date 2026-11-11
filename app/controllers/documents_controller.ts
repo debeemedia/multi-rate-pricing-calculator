@@ -3,6 +3,7 @@ import DocumentService, { DocumentError } from '#services/document_service'
 import Document from '#models/document'
 import {
   createDocumentValidator,
+  generatePdfValidator,
   summaryReportValidator,
   updateDocumentValidator,
 } from '#validators/document'
@@ -11,6 +12,9 @@ import { DocumentStatusesEnum } from '#types/index'
 import { inject } from '@adonisjs/core'
 import { isJsonRequest } from '#helpers/http_helper'
 import { DateTime } from 'luxon'
+import puppeteer from 'puppeteer'
+import app from '@adonisjs/core/services/app'
+import fs from 'node:fs/promises'
 
 @inject()
 export default class DocumentsController {
@@ -184,6 +188,85 @@ export default class DocumentsController {
     session.flash('success', successMessage)
 
     return response.redirect().toRoute('documents.index')
+  }
+
+  /**
+   * Render Document PDF generation page
+   *
+   * `GET /documents/:id/export`
+   */
+  public async showExportForm({ params, auth, view, response }: HttpContext) {
+    const document = await Document.query()
+      .where({ id: params.id, userId: auth.user!.id })
+      .preload('documentLineItems')
+      .firstOrFail()
+
+    if (!document.documentLineItems?.length) {
+      return response.redirect().back()
+    }
+
+    return view.render('pages/documents/show_export_form', { document })
+  }
+
+  /**
+   * Generate Document PDF:
+   * Handle form submission, validate, generate PDF via Puppeteer, and stream download
+   *
+   * `POST /documents/:id/export`
+   */
+  public async generatePdf({ params, request, auth, response, view }: HttpContext) {
+    const payload = await request.validateUsing(generatePdfValidator)
+
+    const document = await Document.query()
+      .where({ id: params.id, userId: auth.user!.id })
+      .preload('documentLineItems')
+      .firstOrFail()
+
+    if (!document.documentLineItems?.length) {
+      return response.redirect().back()
+    }
+
+    /**
+     * @todo: Move the PDF generation into background job.
+     */
+
+    // Launch headless browser instance to render PDF HTML template
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    })
+
+    const page = await browser.newPage()
+
+    const pdfTemplateStyles = `<style>\n${await fs.readFile(
+      app.makePath('resources/css/pdf_template.css'),
+      'utf-8'
+    )}\n</style>`
+
+    const htmlContent = await view.render('pages/documents/pdf_template', {
+      document,
+      lineItems: document.documentLineItems,
+      payload, // Contains bank details, business branding, customer contact, etc.
+      pdfTemplateStyles,
+    })
+
+    await page.setContent(htmlContent, { waitUntil: 'domcontentloaded' })
+
+    const pdfBuffer = await page.pdf({
+      format: 'A4',
+      printBackground: true,
+      margin: { top: '20mm', bottom: '25mm', left: '20mm', right: '20mm' },
+    })
+
+    await browser.close()
+
+    //  Stream file download back to the client
+    const filename = `${document.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_invoice.pdf`
+
+    response.header('Content-Type', 'application/pdf')
+    response.header('Content-Disposition', `attachment; filename="${filename}"`)
+
+    return response.send(pdfBuffer)
   }
 
   /**

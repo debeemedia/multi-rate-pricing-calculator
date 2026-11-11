@@ -2,84 +2,8 @@
   <div>
     <div>
       @link({ route: 'home', text: 'Home' })
-        <svg
-          width="150"
-          height="28"
-          viewBox="0 0 165 32"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          aria-label="HiveDocs"
-        >
-          <!--Hexagon with Nested Document-->
-          <g transform="translate(0, 3)">
-            <polygon
-              points="13,0 24,6 24,18 13,24 2,18 2,6"
-              fill="currentColor"
-              fill-opacity="0.12"
-              stroke="currentColor"
-              stroke-width="1.8"
-              stroke-linejoin="round"
-            />
-            <rect
-              x="8"
-              y="6"
-              width="10"
-              height="12"
-              rx="1"
-              fill="currentColor"
-              fill-opacity="0.9"
-            />
-            <line
-              x1="10"
-              y1="9"
-              x2="16"
-              y2="9"
-              stroke="#ffffff"
-              stroke-width="1.2"
-              stroke-linecap="round"
-            />
-            <line
-              x1="10"
-              y1="12"
-              x2="14"
-              y2="12"
-              stroke="#ffffff"
-              stroke-width="1.2"
-              stroke-linecap="round"
-            />
-            <line
-              x1="10"
-              y1="15"
-              x2="15"
-              y2="15"
-              stroke="#ffffff"
-              stroke-width="1.2"
-              stroke-linecap="round"
-            />
-          </g>
-          <!--Typographic Mark-->
-          <text
-            x="34"
-            y="22"
-            fill="currentColor"
-            font-family="system-ui, -apple-system, sans-serif"
-            font-weight="800"
-            font-size="22"
-            letter-spacing="-0.8px"
-          >
-            
-            
-            
-            
-            
-    HIVE
-
-
-
-
-            <tspan fill-opacity="0.75" font-weight="300">DOCS</tspan>
-          </text>
-        </svg>
+        @component('components/logo', { width: '150', height: '28' })
+        @end
       @end
     </div>
     <div>

@@ -1,0 +1,205 @@
+@layout()
+  <div class="document-detail-container">
+    {{-- Breadcrumb Navigation --}}
+    <div class="mb-4">
+      <a href="{{ route('documents.show', { id: document.id }) }}" class="back-link">
+        ← Back to Document Details
+      </a>
+    </div>
+    {{-- Header Summary Card --}}
+    <div class="document-header-card">
+      <div class="header-title-row">
+        <h1>Export PDF Configuration</h1>
+        <span class="badge {{ document.status === 'finalized' ? 'badge-success' : 'badge-draft' }}">
+          {{ document.status }}
+        </span>
+      </div>
+      <p class="subtitle">
+        Document:
+        <strong>{{ document.title }}</strong>
+        <span class="divider">•</span>
+        Issue Date:
+        <strong>
+          {{
+            new Date(document.issueDate).toLocaleDateString('en-NG', {
+              day: 'numeric',
+              month: 'short',
+              year: 'numeric',
+            })
+          }}
+        </strong>
+        <span class="divider">•</span>
+        Customer:
+        <strong>{{ document.customerName }}</strong>
+      </p>
+    </div>
+    {{-- Pre-Export Form Block --}}
+    <div class="card-form-block">
+      <h3>Invoice & Operational Details</h3>
+      <form action="{{ route('documents.generate_pdf', { id: document.id }) }}" method="POST">
+        {{ csrfField() }}
+        <div class="line-item-grid">
+          {{-- Client & Attn Details --}}
+          <div class="grid-field span-2">
+            <label for="customer-name">Customer / Client Name</label>
+            <input
+              type="text"
+              id="customer-name"
+              name="customerName"
+              value="{{ old('customerName') ?? document.customerName ?? '' }}"
+              required
+            />
+          </div>
+
+          <div class="grid-field span-2">
+            <label for="customer-contact">Customer Attn / Contact (Email or Phone)</label>
+            <input
+              type="text"
+              id="customer-contact"
+              name="customerContact"
+              placeholder="e.g. client@email.com or +234..."
+              value="{{ old('customerContact') || '' }}"
+            />
+          </div>
+          {{-- Issuer / Brand Details --}}
+          <div class="grid-field span-2">
+            <label for="business-name">Your Business / Brand Name</label>
+            <input
+              type="text"
+              id="business-name"
+              name="businessName"
+              placeholder="e.g. deBee Media"
+              value="{{ old('businessName') || '' }}"
+              required
+            />
+          </div>
+
+          <div class="grid-field span-2">
+            <label for="business-tagline">Tagline / Description</label>
+            <input
+              type="text"
+              id="business-tagline"
+              name="businessTagline"
+              placeholder="e.g. Software Engineering & Digital Media"
+              value="{{ old('businessTagline') || '' }}"
+            />
+          </div>
+
+          <div class="grid-field span-2">
+            <label for="business-contact">Your Contact Info (Email / Phone)</label>
+            <input
+              type="text"
+              id="business-contact"
+              name="businessContact"
+              placeholder="e.g. debeemediasolutions@gmail.com"
+              value="{{ old('businessContact') || '' }}"
+              required
+            />
+          </div>
+          {{-- Banking Details --}}
+          <div class="grid-field span-2">
+            <label for="bank-name">Bank Name</label>
+            <input
+              type="text"
+              id="bank-name"
+              name="bankName"
+              placeholder="e.g. Zenith Bank"
+              value="{{ old('bankName') || '' }}"
+              required
+            />
+          </div>
+
+          <div class="grid-field span-2">
+            <label for="account-name">Account Name</label>
+            <input
+              type="text"
+              id="account-name"
+              name="accountName"
+              placeholder="e.g. deBee Media"
+              value="{{ old('accountName') || '' }}"
+              required
+            />
+          </div>
+
+          <div class="grid-field span-2">
+            <label for="account-number">Account Number</label>
+            <input
+              type="text"
+              id="account-number"
+              name="accountNumber"
+              placeholder="e.g. 0123456789"
+              value="{{ old('accountNumber') || '' }}"
+              required
+            />
+          </div>
+
+          <div class="grid-field span-2">
+            <label for="payment-reference">Payment Reference</label>
+            <input
+              type="text"
+              id="payment-reference"
+              name="paymentReference"
+              placeholder="e.g. {{ document.title }}"
+              value="{{ old('paymentReference') || '' }}"
+              maxlength="20"
+            />
+          </div>
+
+          <div class="grid-field span-2">
+            <label for="payment-terms">Payment Terms</label>
+            <input
+              type="text"
+              id="payment-terms"
+              name="paymentTerms"
+              placeholder="e.g. 50% upfront. 50% on completion."
+              value="{{ old('paymentTerms') || '' }}"
+              required
+            />
+          </div>
+
+          <div class="grid-field span-2">
+            <label for="notes">Additional Notes / Instructions</label>
+            <input
+              type="text"
+              id="notes"
+              name="notes"
+              placeholder="e.g. Thank you for your business!"
+              value="{{ old('notes') || '' }}"
+            />
+          </div>
+        </div>
+
+        <div class="mt-4 form-actions">
+          <div class="export-watermark-notice">
+            <div class="notice-content">
+              <svg
+                class="notice-icon"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+              </svg>
+              <span>PDF will include a <strong>HiveDocs</strong> watermark footer.</span>
+            </div>
+            <button type="button" class="upgrade-btn-disabled" disabled title="Coming soon">
+              Remove (Pro Soon)
+            </button>
+          </div>
+
+          <div class="action-buttons-row">
+            <button type="submit" class="button primary">Generate & Download PDF</button>
+            <a href="{{ route('documents.show', { id: document.id }) }}" class="button secondary">
+              Cancel
+            </a>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+@end
