@@ -1,10 +1,10 @@
-# Multi-Rate Pricing Calculator
+# HiveDocs | Multi-Rate Document & Invoicing Calculator
 
 A web application built with AdonisJS v7, TypeScript, and PostgreSQL that lets users manage documents, compute multi-rate line-item discounts and taxes server-side, maintain strict lifecycle immutability for finalized documents, generate summary reports for different ranges, and print document invoice PDFs.
 
 ## Live Demo & Repository
 
-Live App URL: [https://multi-rate-pricing-calculator-pp8y.onrender.com](https://multi-rate-pricing-calculator-pp8y.onrender.com)
+Live App URL: [https://hive-docs.onrender.com](https://hive-docs.onrender.com)
 
 Repository: [https://github.com/debeemedia/multi-rate-pricing-calculator](https://github.com/debeemedia/multi-rate-pricing-calculator)
 
@@ -286,7 +286,7 @@ All requests expecting JSON payloads must include the `Accept: application/json`
 
 Standard RESTful HTTP status codes (`200 OK`, `201 Created`, `400 Bad Request`, `404 Not Found`, `422 Unprocessable Entity` `401 Unauthorized` etc.) are returned.
 
-The base URL for all API requests is: `https://multi-rate-pricing-calculator-pp8y.onrender.com`
+The base URL for all API requests is: `https://hive-docs.onrender.com`
 
 ### Documents (`/documents`)
 
