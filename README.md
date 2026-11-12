@@ -1,6 +1,6 @@
 # HiveDocs | Multi-Rate Document & Invoicing Calculator
 
-A web application built with AdonisJS v7, TypeScript, and PostgreSQL that lets users manage documents, compute multi-rate line-item discounts and taxes server-side, maintain strict lifecycle immutability for finalized documents, generate summary reports for different ranges, and print document invoice PDFs.
+A web application built with AdonisJS v7, TypeScript, and PostgreSQL that lets users manage documents, compute multi-rate line-item discounts and taxes server-side, maintain strict lifecycle immutability for finalized documents, generate summary reports for different ranges, and preview & print document invoice PDFs.
 
 ## Live Demo & Repository
 
@@ -20,7 +20,7 @@ Repository: [https://github.com/debeemedia/multi-rate-pricing-calculator](https:
 - **Auth & Data Isolation:** Multi-tenant isolation ensuring users can only view, edit, or report on their own documents.
 - **Server-Side Financial Engine:** Integer-based minor unit (e.g cent) representation avoiding JavaScript IEEE 754 floating-point drift.
 - **Strict Document Lifecycle:** Draft documents are fully editable; finalized documents become immutable across both UI and API levels.
-- **Document Invoice PDF Generation:** Combines documents and line items data, with allowance for user input of additional data e.g payment terms, bank details etc. via a form, to generate an invoice PDF (with Puppeteer) for download.
+- **Document Invoice PDF Generation:** Combines documents and line items data, with allowance for user input of additional data e.g payment terms, business and bank details etc. via a form, to generate an invoice PDF (with Puppeteer) for download. Preview before download is also supported.
 - **Date-Bounded Summary Reporting:** Aggregates metrics (Total Documents, Revenue, Discounts, Tax) across customizable currencies and date ranges, with composite index on relevant columns (`user_id, issue_date, status`, `currency_code`) for fast lookups.
 - **Responsive & Intuitive UI:** Modern, mobile-first CSS architecture featuring adaptive grid systems, seamless media query breakpoints, and clear visual navigation across all viewport sizes.
 - **System Health Monitoring:** Exposes a lightweight `GET /health` endpoint for server uptime and database connectivity checks.
