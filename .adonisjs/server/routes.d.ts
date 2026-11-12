@@ -18,7 +18,7 @@ export type ScannedRoutes = {
     'documents.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'documents.finalize': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'documents.show_export_form': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'documents.preview_pdf': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'documents.preview_export': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'documents.generate_pdf': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'documents.summary_report': { paramsTuple?: []; params?: {} }
     'documents.document_line_items.store': { paramsTuple: [ParamValue]; params: {'document_id': ParamValue} }
@@ -52,7 +52,7 @@ export type ScannedRoutes = {
     'session.store': { paramsTuple?: []; params?: {} }
     'session.destroy': { paramsTuple?: []; params?: {} }
     'documents.store': { paramsTuple?: []; params?: {} }
-    'documents.preview_pdf': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'documents.preview_export': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'documents.generate_pdf': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'documents.document_line_items.store': { paramsTuple: [ParamValue]; params: {'document_id': ParamValue} }
   }

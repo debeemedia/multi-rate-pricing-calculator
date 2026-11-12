@@ -218,11 +218,11 @@ export default class DocumentsController {
   }
 
   /**
-   * Preview the Document PDF
+   * Preview the Document (to be exported as PDF) layout as raw HTML & CSS
    *
    * `POST /documents/:id/preview`
    */
-  public async previewPdf(ctx: HttpContext) {
+  public async previewExport(ctx: HttpContext) {
     const documentHtmlResult = await this.#getDocumentHtml(ctx, true)
 
     const { response } = ctx
