@@ -29,6 +29,11 @@ body {
   line-height: 1.5;
 }
 
+/* When previewing in browser, add margins */
+body.browser-preview-mode {
+  margin: 48px;
+}
+
 /* Header Layout */
 .invoice-header {
   display: flex;

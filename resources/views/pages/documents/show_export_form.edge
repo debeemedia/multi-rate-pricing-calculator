@@ -206,10 +206,22 @@
           </div>
 
           <div class="action-buttons-row">
-            <button type="submit" class="button primary">Generate & Download PDF</button>
-            <a href="{{ route('documents.show', { id: document.id }) }}" class="button secondary">
-              Cancel
-            </a>
+            <button
+              type="submit"
+              formaction="{{ route('documents.preview_pdf', { id: document.id }) }}"
+              formtarget="_blank"
+              class="button secondary"
+            >
+              Preview
+            </button>
+            <button
+              type="submit"
+              formaction="{{ route('documents.generate_pdf', { id: document.id }) }}"
+              class="button primary"
+            >
+              Download PDF
+            </button>
+            <a href="{{ route('documents.show', { id: document.id }) }}" class="cancel">Cancel</a>
           </div>
         </div>
       </form>

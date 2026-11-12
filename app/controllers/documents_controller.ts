@@ -218,23 +218,40 @@ export default class DocumentsController {
   }
 
   /**
+   * Preview the Document PDF
+   *
+   * `POST /documents/:id/preview`
+   */
+  public async previewPdf(ctx: HttpContext) {
+    const documentHtmlResult = await this.#getDocumentHtml(ctx, true)
+
+    const { response } = ctx
+
+    if (!documentHtmlResult) {
+      return response.redirect().back()
+    }
+
+    const { htmlContent } = documentHtmlResult
+
+    return response.send(htmlContent)
+  }
+
+  /**
    * Generate Document PDF:
    * Handle form submission, validate, generate PDF via Puppeteer, and stream download
    *
    * `POST /documents/:id/export`
    */
-  public async generatePdf({ params, request, auth, response, view }: HttpContext) {
-    const payload = await request.validateUsing(generatePdfValidator)
+  public async generatePdf(ctx: HttpContext) {
+    const documentHtmlResult = await this.#getDocumentHtml(ctx)
 
-    const document = await DocumentService.preloadCurrencyRelation(
-      Document.query().where({ id: params.id, userId: auth.user!.id })
-    )
-      .preload('documentLineItems')
-      .firstOrFail()
+    const { auth, response } = ctx
 
-    if (!document.documentLineItems?.length) {
+    if (!documentHtmlResult) {
       return response.redirect().back()
     }
+
+    const { document, htmlContent, payload } = documentHtmlResult
 
     // Save the invoice defaults for next autofill
     const { customerName, customerContact, paymentReference, ...invoiceDefaults } = payload
@@ -254,18 +271,6 @@ export default class DocumentsController {
 
     const page = await browser.newPage()
 
-    const pdfTemplateStyles = `<style>\n${await fs.readFile(
-      app.makePath('resources/css/pdf_template.css'),
-      'utf-8'
-    )}\n</style>`
-
-    const htmlContent = await view.render('pages/documents/pdf_template', {
-      document,
-      lineItems: document.documentLineItems,
-      payload, // Contains bank details, business branding, customer contact, etc.
-      pdfTemplateStyles,
-    })
-
     await page.setContent(htmlContent, { waitUntil: 'domcontentloaded' })
 
     const pdfBuffer = await page.pdf({
@@ -283,6 +288,37 @@ export default class DocumentsController {
     response.header('Content-Disposition', `attachment; filename="${filename}"`)
 
     return response.send(pdfBuffer)
+  }
+
+  async #getDocumentHtml(ctx: HttpContext, isPreview = false) {
+    const { params, request, auth, view } = ctx
+
+    const payload = await request.validateUsing(generatePdfValidator)
+
+    const document = await DocumentService.preloadCurrencyRelation(
+      Document.query().where({ id: params.id, userId: auth.user!.id })
+    )
+      .preload('documentLineItems')
+      .firstOrFail()
+
+    if (!document.documentLineItems?.length) {
+      return
+    }
+
+    const pdfTemplateStyles = `<style>\n${await fs.readFile(
+      app.makePath('resources/css/pdf_template.css'),
+      'utf-8'
+    )}\n</style>`
+
+    const htmlContent = await view.render('pages/documents/pdf_template', {
+      document,
+      lineItems: document.documentLineItems,
+      payload, // Contains bank details, business branding, customer contact, etc.
+      pdfTemplateStyles,
+      isPreview,
+    })
+
+    return { document, htmlContent, payload }
   }
 
   /**

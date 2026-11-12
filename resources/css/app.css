@@ -942,6 +942,13 @@ textarea {
   align-items: center;
 }
 
+.cancel {
+  color: var(--gray-8);
+  font-size: 14px;
+  text-decoration: none;
+  margin-left: 8px;
+}
+
 /**
 end of show_export_form.edge styles
  **/
@@ -1324,6 +1331,10 @@ end of summary_report.edge styles
     width: 100%;
     text-align: center;
     justify-content: center;
+  }
+
+  .cancel {
+    margin-left: 0px;
   }
 }
 

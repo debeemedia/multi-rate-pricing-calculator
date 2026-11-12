@@ -43,8 +43,12 @@ router
       .as('documents.show_export_form') // View document PDF generation page
 
     router
+      .post('documents/:id/preview', [controllers.Documents, 'previewPdf'])
+      .as('documents.preview_pdf') // Preview the PDF
+
+    router
       .post('documents/:id/export', [controllers.Documents, 'generatePdf'])
-      .as('documents.generate_pdf')
+      .as('documents.generate_pdf') // Download the PDF
 
     router
       .get('documents/reports/summary', [controllers.Documents, 'summaryReport'])

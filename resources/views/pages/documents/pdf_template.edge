@@ -5,7 +5,7 @@
     <title>{{ document.title }} - Invoice</title>
     {{{ pdfTemplateStyles }}}
   </head>
-  <body>
+  <body class="{{ isPreview ? 'browser-preview-mode' : 'print-mode' }}">
     {{-- Header --}}
     <div class="invoice-header">
       <div class="brand-section">
