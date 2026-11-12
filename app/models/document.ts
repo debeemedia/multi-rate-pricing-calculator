@@ -5,9 +5,11 @@ import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
 import User from './user.ts'
 import DocumentLineItem from './document_line_item.ts'
 import { moneyColumnConfig } from '#helpers/model_helper'
-import Currency from './currency.ts'
+import Currency, { SupportedCurrencyCode } from './currency.ts'
 
 export default class Document extends DocumentSchema {
+  declare currencyCode: SupportedCurrencyCode
+
   /**
    * IMPORTANT: All amount-related columns are stored in minor unit and returned in major unit.
    */

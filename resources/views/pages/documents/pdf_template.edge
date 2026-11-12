@@ -175,7 +175,7 @@
 
           <p class="payment-terms-text">
             <strong>Payment Terms:</strong>
-            {{ payload.paymentTerms }}
+            <span>{{ payload.paymentTerms }}</span>
           </p>
         </div>
         @if(payload.notes)
@@ -187,9 +187,11 @@
       </div>
       {{-- Final Document Watermark --}}
       <div class="hivedocs-final-watermark">
-        <span>Generated via</span>
-        @component('components/logo', { width: '110', height: '20' })
-        @end
+        <a href="{{ appUrl }}" target="_blank" rel="noopener noreferrer">
+          <span>Generated via</span>
+          @component('components/logo', { width: '110', height: '20' })
+          @end
+        </a>
       </div>
     </div>
   </body>

@@ -177,17 +177,17 @@ export const updateDocumentValidator = vine.create(
  */
 export const generatePdfValidator = vine.create(
   vine.object({
-    customerName: vine.string().trim().use(stripTags()).trim().minLength(1),
-    customerContact: vine.string().trim().use(stripTags()).trim().optional(),
-    businessName: vine.string().trim().use(stripTags()).trim().minLength(1),
-    businessTagline: vine.string().trim().use(stripTags()).trim().optional(),
-    businessContact: vine.string().trim().use(stripTags()).trim().minLength(1),
-    bankName: vine.string().trim().use(stripTags()).trim().minLength(1),
-    accountName: vine.string().trim().use(stripTags()).trim().minLength(1),
-    accountNumber: vine.string().trim().use(stripTags()).trim().minLength(1),
+    customerName: vine.string().trim().use(stripTags()).trim().minLength(1).maxLength(50),
+    customerContact: vine.string().trim().use(stripTags()).trim().maxLength(50).optional(),
+    businessName: vine.string().trim().use(stripTags()).trim().minLength(1).maxLength(50),
+    businessTagline: vine.string().trim().use(stripTags()).trim().maxLength(100).optional(),
+    businessContact: vine.string().trim().use(stripTags()).trim().minLength(1).maxLength(50),
+    bankName: vine.string().trim().use(stripTags()).trim().minLength(1).maxLength(50),
+    accountName: vine.string().trim().use(stripTags()).trim().minLength(1).maxLength(100),
+    accountNumber: vine.string().trim().use(stripTags()).trim().minLength(1).maxLength(50),
     paymentReference: vine.string().maxLength(20).optional(),
-    paymentTerms: vine.string().trim().use(stripTags()).trim().minLength(1),
-    notes: vine.string().trim().use(stripTags()).trim().optional(),
+    paymentTerms: vine.string().trim().use(stripTags()).trim().minLength(1).maxLength(200),
+    notes: vine.string().trim().use(stripTags()).trim().maxLength(300).optional(),
   })
 )
 
