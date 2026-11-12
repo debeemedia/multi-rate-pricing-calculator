@@ -884,10 +884,16 @@ end of show.edge styles
  **/
 
 /**
-show_evport_form.edge styles
+show_export_form.edge styles
 
 (also uses show.edge styles)
  **/
+
+textarea {
+  font-size: 0.85rem;
+  color: #4b5563;
+  padding: 7px;
+}
 
 .export-watermark-notice {
   display: flex;
@@ -937,7 +943,7 @@ show_evport_form.edge styles
 }
 
 /**
-end of show_evport_form.edge styles
+end of show_export_form.edge styles
  **/
 
 /**

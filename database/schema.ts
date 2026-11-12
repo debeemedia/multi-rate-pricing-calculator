@@ -95,7 +95,7 @@ export class DocumentSchema extends BaseModel {
 }
 
 export class UserSchema extends BaseModel {
-  static $columns = ['createdAt', 'email', 'firstName', 'id', 'lastName', 'password', 'updatedAt'] as const
+  static $columns = ['createdAt', 'email', 'firstName', 'id', 'lastInvoiceDefaults', 'lastName', 'password', 'updatedAt'] as const
   $columns = UserSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -105,6 +105,8 @@ export class UserSchema extends BaseModel {
   declare firstName: string | null
   @column({ isPrimary: true })
   declare id: string
+  @column()
+  declare lastInvoiceDefaults: any | null
   @column()
   declare lastName: string | null
   @column({ serializeAs: null })

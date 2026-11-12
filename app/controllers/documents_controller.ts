@@ -210,7 +210,11 @@ export default class DocumentsController {
       return response.redirect().back()
     }
 
-    return view.render('pages/documents/show_export_form', { document })
+    return view.render('pages/documents/show_export_form', {
+      document,
+      // Provide last invoice defaults for autofill
+      lastInvoiceDefaults: auth.user!.lastInvoiceDefaults,
+    })
   }
 
   /**
@@ -231,6 +235,12 @@ export default class DocumentsController {
     if (!document.documentLineItems?.length) {
       return response.redirect().back()
     }
+
+    // Save the invoice defaults for next autofill
+    const { customerName, customerContact, paymentReference, ...invoiceDefaults } = payload
+
+    auth.user!.lastInvoiceDefaults = invoiceDefaults
+    await auth.user!.save()
 
     /**
      * @todo: Move the PDF generation into background job.

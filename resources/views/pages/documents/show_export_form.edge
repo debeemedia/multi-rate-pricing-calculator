@@ -48,6 +48,7 @@
               name="customerName"
               value="{{ old('customerName') ?? document.customerName ?? '' }}"
               required
+              maxlength="50"
             />
           </div>
 
@@ -59,6 +60,7 @@
               name="customerContact"
               placeholder="e.g. client@email.com or +234..."
               value="{{ old('customerContact') || '' }}"
+              maxlength="50"
             />
           </div>
           {{-- Issuer / Brand Details --}}
@@ -69,8 +71,9 @@
               id="business-name"
               name="businessName"
               placeholder="e.g. deBee Media"
-              value="{{ old('businessName') || '' }}"
+              value="{{ old('businessName') || lastInvoiceDefaults?.businessName || '' }}"
               required
+              maxlength="50"
             />
           </div>
 
@@ -81,7 +84,8 @@
               id="business-tagline"
               name="businessTagline"
               placeholder="e.g. Software Engineering & Digital Media"
-              value="{{ old('businessTagline') || '' }}"
+              value="{{ old('businessTagline') || lastInvoiceDefaults?.businessTagline || '' }}"
+              maxlength="100"
             />
           </div>
 
@@ -92,8 +96,9 @@
               id="business-contact"
               name="businessContact"
               placeholder="e.g. debeemediasolutions@gmail.com"
-              value="{{ old('businessContact') || '' }}"
+              value="{{ old('businessContact') || lastInvoiceDefaults?.businessContact || '' }}"
               required
+              maxlength="50"
             />
           </div>
           {{-- Banking Details --}}
@@ -104,8 +109,9 @@
               id="bank-name"
               name="bankName"
               placeholder="e.g. Zenith Bank"
-              value="{{ old('bankName') || '' }}"
+              value="{{ old('bankName') || lastInvoiceDefaults?.bankName || '' }}"
               required
+              maxlength="50"
             />
           </div>
 
@@ -116,8 +122,9 @@
               id="account-name"
               name="accountName"
               placeholder="e.g. deBee Media"
-              value="{{ old('accountName') || '' }}"
+              value="{{ old('accountName') || lastInvoiceDefaults?.accountName || '' }}"
               required
+              maxlength="100"
             />
           </div>
 
@@ -128,8 +135,9 @@
               id="account-number"
               name="accountNumber"
               placeholder="e.g. 0123456789"
-              value="{{ old('accountNumber') || '' }}"
+              value="{{ old('accountNumber') || lastInvoiceDefaults?.accountNumber || '' }}"
               required
+              maxlength="50"
             />
           </div>
 
@@ -147,25 +155,32 @@
 
           <div class="grid-field span-2">
             <label for="payment-terms">Payment Terms</label>
-            <input
+            <textarea
               type="text"
               id="payment-terms"
               name="paymentTerms"
               placeholder="e.g. 50% upfront. 50% on completion."
-              value="{{ old('paymentTerms') || '' }}"
               required
-            />
+              rows="3"
+              maxlength="200"
+            >{{ old('paymentTerms') || lastInvoiceDefaults?.paymentTerms || '' }}</textarea>
           </div>
 
           <div class="grid-field span-2">
             <label for="notes">Additional Notes / Instructions</label>
-            <input
+            <textarea
               type="text"
               id="notes"
               name="notes"
-              placeholder="e.g. Thank you for your business!"
-              value="{{ old('notes') || '' }}"
-            />
+              placeholder="e.g. Please include invoice title as payment reference. Thank you for your business!"
+              rows="3"
+              maxlength="300"
+            >{{
+                old('notes') ||
+                lastInvoiceDefaults?.notes ||
+                'Thank you for your business!' ||
+                ''
+              }}</textarea>
           </div>
         </div>
 

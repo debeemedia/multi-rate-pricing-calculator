@@ -214,6 +214,13 @@ body {
   margin-top: 10px;
 }
 
+.payment-terms-text span,
+.notes-box p {
+  /* This tells CSS to respect line breaks (\n) and wrap long sentences */
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
 /* Container holding payment box + watermark together */
 .bottom-document-cluster {
   margin-top: 32px;
