@@ -8,6 +8,10 @@ Live App URL: [https://hive-docs.onrender.com](https://hive-docs.onrender.com)
 
 Repository: [https://github.com/debeemedia/multi-rate-pricing-calculator](https://github.com/debeemedia/multi-rate-pricing-calculator)
 
+
+https://github.com/user-attachments/assets/a6cd0a22-dbce-47de-b2bd-32640ca08c80
+
+
 ## Tech Stack & Architectural Choices
 
 - **AdonisJS v7 (Node.js) & TypeScript:** Selected for its batteries-included, cohesive ecosystem and native TypeScript support for end-to-end type safety. Featuring first-party modules for authentication, validation (VineJS), ORM (Lucid), templating (Edge), and testing (Japa) that eliminated third-party dependency bloat and guaranteed architectural consistency across the monolith.
