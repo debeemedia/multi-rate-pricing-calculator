@@ -44,6 +44,7 @@
                 value="{{ old('title') || document.title }}"
                 placeholder="Title"
                 required
+                maxlength="50"
               />
             </div>
             <div class="inline-field">
@@ -55,6 +56,7 @@
                 value="{{ old('customerName') || document.customerName }}"
                 placeholder="Customer Name"
                 required
+                maxlength="50"
               />
             </div>
             <div class="inline-field">
@@ -247,6 +249,7 @@
                 placeholder="e.g. Web Development"
                 value="{{ old('description') || '' }}"
                 required
+                maxlength="100"
               />
             </div>
 
